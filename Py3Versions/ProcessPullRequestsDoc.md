@@ -1,3 +1,5 @@
+**Note:** All changes not presented here simply add an opening and closing parenthesis to a print statement when it already has one of each. It will be determined whether or not they are necessary.
+
 **Change on line 196**
 
 Original:
@@ -8,6 +10,102 @@ Edit:
 ```
 print(format % tuple([Msg]+list(map(str,Args))))
 ```
-Suggestion: This edit should be fine as is.
+Suggestion: This edit should be kept.
 
+
+**Changes from lines 1214-1219**
+
+Original:
+```
+print("\tResult: "+result)
+                               
+    if newlyClosedPrs == 0:
+        print("No PR closed from last run.")
+    else:
+        print(str(newlyClosedPrs) +" PR(s) are closed and moved to OldPrs directory")
+```
+Edit:
+```
+print(("\tResult: "+result))
+                               
+    if newlyClosedPrs == 0:
+        print("No PR closed from last run.")
+    else:
+        print((str(newlyClosedPrs) +" PR(s) are closed and moved to OldPrs directory"))
+```
+Suggestion: Only one of the last two print statements has an extra parentheses, should be adjusted to where both have either one or two.
+
+**Change on line 1514, 2036**
+
+Original:
+```
+if type(result) != type(u' '):
+```
+Edit:
+```
+if type(result) != type(' '):
+```
+Suggestion: the u in type is for unicode, so if it is intended to be in unicode regardless then the edit can stay.
+
+**Change on line 1733, 1786, 1791, 1795, 1813, 1816**
+
+Original:
+```
+print str(e)+"(line: "+str(inspect.stack()[0][2])+")"
+```
+Edit:
+```
+print(str(e)+"(line: "+str(inspect.stack()[0][2])+")")
+```
+Suggestion: This edit should be kept.
+
+**Changes from line 2802-2806**
+
+Original:
+```
+        result = u'Build: failed \n' # '\xc2\xae\n'
+        result += "Error(s): 7\n"
+        result += u"/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:595:27: error: expected initializer before ‘-’ token\n"
+        result += u"/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:596:13: error: ‘fileSize’ was not declared in this scope\n"
+        result += u"/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:606:5: error: control reaches end of non-void function [-Werror=return-type]\n"
+```
+Edit:
+```
+        result = 'Build: failed \n' # '\xc2\xae\n'
+        result += "Error(s): 7\n"
+        result += "/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:595:27: error: expected initializer before ‘-’ token\n"
+        result += "/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:596:13: error: ‘fileSize’ was not declared in this scope\n"
+        result += "/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:606:5: error: control reaches end of non-void function [-Werror=return-type]\n"
+```
+Suggestion: The removed u's represent unicode, will be determined if the original conversion is necessary.
+
+**Change on lines 2829, 2859, 2884, 2893**
+
+Original:
+```
+msg= u'Automated Smoketest \n ' #'  \xe2\x80\x98 Test \xe2\x80\x99 \n'
+```
+Edit:
+```
+msg= 'Automated Smoketest \n ' #'  \xe2\x80\x98 Test \xe2\x80\x99 \n'
+```
+Suggestion: The removed u represent unicode, will be determined if the original conversion is necessary.
+
+**Change on line 3004-3007**
+
+Original:
+```
+print "Exception in user code:"
+print '-'*60
+traceback.print_exc(file=sys.stdout)
+print '-'*60
+```
+Edit:
+```
+print("Exception in user code:")
+print('-'*60)
+traceback.print_exc(file=sys.stdout)
+print('-'*60)
+```
+Suggestion: This edit should be kept.
 
