@@ -1734,11 +1734,11 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
                         pass
                     except KeyError as e:
                         print("items[0]:'%s', items[1]:'%s" % (items[0], items[1]))
-                        print "Exception:" + str(e) + "(line: "+str(inspect.stack()[0][2]) + ")"
+                        print("Exception:" + str(e) + "(line: "+str(inspect.stack()[0][2]) + ")")
                         pass
                     except IndexError as e:
                         print("items[0]:'%s', items[1]:'%s" % (items[0], items[1]))
-                        print "Exception:" + str(e) + "(line: "+str(inspect.stack()[0][2]) + ")"
+                        print("Exception:" + str(e) + "(line: "+str(inspect.stack()[0][2]) + ")")
                     except:
                         print("Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" )
                         print("items[0]:'%s', items[1]:'%s" % (items[0], items[1]))

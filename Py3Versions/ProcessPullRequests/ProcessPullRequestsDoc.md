@@ -50,7 +50,7 @@ if type(result) != type(' '):
 Suggestion: the u in type is for unicode, so if it is intended to be in unicode regardless then the edit can stay.
 Update: Followed edit
 
-**Change on line 1733, 1786, 1791, 1795, 1813, 1816**
+**Change on line 1733, 1737, 1741, 1786, 1791, 1795, 1813, 1816**
 
 Original:
 ```
