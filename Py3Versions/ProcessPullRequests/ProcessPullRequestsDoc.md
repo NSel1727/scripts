@@ -11,6 +11,7 @@ Edit:
 print(format % tuple([Msg]+list(map(str,Args))))
 ```
 Suggestion: This edit should be kept.
+Update: Followed edit
 
 
 **Changes from lines 1214-1219**
@@ -34,6 +35,7 @@ print(("\tResult: "+result))
         print((str(newlyClosedPrs) +" PR(s) are closed and moved to OldPrs directory"))
 ```
 Suggestion: Only one of the last two print statements has an extra parentheses, should be adjusted to where both have either one or two.
+Update: Followed original
 
 **Change on line 1514, 2036**
 
@@ -46,6 +48,7 @@ Edit:
 if type(result) != type(' '):
 ```
 Suggestion: the u in type is for unicode, so if it is intended to be in unicode regardless then the edit can stay.
+Update: Followed edit
 
 **Change on line 1733, 1786, 1791, 1795, 1813, 1816**
 
@@ -58,6 +61,7 @@ Edit:
 print(str(e)+"(line: "+str(inspect.stack()[0][2])+")")
 ```
 Suggestion: This edit should be kept.
+Update: Followed edit
 
 **Changes from line 2802-2806**
 
@@ -78,6 +82,7 @@ Edit:
         result += "/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:606:5: error: control reaches end of non-void function [-Werror=return-type]\n"
 ```
 Suggestion: The removed u's represent unicode, will be determined if the original conversion is necessary.
+Update: Followed edit
 
 **Change on lines 2829, 2859, 2884, 2893**
 
@@ -90,6 +95,7 @@ Edit:
 msg= 'Automated Smoketest \n ' #'  \xe2\x80\x98 Test \xe2\x80\x99 \n'
 ```
 Suggestion: The removed u represent unicode, will be determined if the original conversion is necessary.
+Update: Followed edit
 
 **Change on line 3004-3007**
 
@@ -108,4 +114,5 @@ traceback.print_exc(file=sys.stdout)
 print('-'*60)
 ```
 Suggestion: This edit should be kept.
+Update: Followed edit
 
