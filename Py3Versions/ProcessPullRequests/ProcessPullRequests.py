@@ -1511,7 +1511,7 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
         else:
             resultFile.write("\t"+result+"\n")
         #result = result.replace('\n', '\\n')+"\\n"
-        if type(result) != type(' '):
+        if type(result) != type(u' '):
             result = repr(result).replace('\'', '') #.replace('\\\\','\\')+"\n"
 
         result = result.replace('\n','')
@@ -2033,7 +2033,7 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
 
     msg = msg.replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\n', '\\n').replace('"', '\'') #.replace('\\xc2\\xae', '\xc2\xae')
 
-    if type(msg) == type(' '):
+    if type(msg) == type(u' '):
         msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
         msg = repr(msg)
     else:
