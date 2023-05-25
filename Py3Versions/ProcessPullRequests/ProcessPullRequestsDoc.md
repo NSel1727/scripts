@@ -1,3 +1,5 @@
+##2to3 Changes
+
 **Note:** All changes not presented here simply add an opening and closing parenthesis to a print statement when it already has one of each. It will be determined whether or not they are necessary.
 
 **Change on line 196**
@@ -115,4 +117,29 @@ print('-'*60)
 ```
 Suggestion: This edit should be kept.
 Update: Followed edit
+
+
+##POST 2to3 CHANGES
+
+**Issue on line 135**
+
+Original:
+```
+sysId = platform.dist()[0] + ' ' + platform.dist()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
+```
+
+Error Message:
+"AttributeError: module 'platform' has no attribute 'dist'"
+
+Current Fix:
+```
+sysId = platform.uname()[0] + ' ' + platform.uname()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
+```
+
+**Issue on line 142**
+
+Original:
+```
+sysId += '\n Host: ' + myProc.stdout.read().rstrip('\n')
+```
 
