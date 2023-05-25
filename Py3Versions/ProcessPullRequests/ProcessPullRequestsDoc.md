@@ -166,3 +166,31 @@ sysId += ',  CMake: ' + myProc.stdout.read().decode('utf-8').rstrip('\n').split(
 The length of .split() is 0, meaning that what Popen opens is likely empty.
 
 Update: This issue was fixed by installing cmake.
+
+**Issue on line 2933**
+
+Original:
+```
+print("Average Session Time                               : " + str(averageSessionTime) + " hours"
+```
+
+Error Message: TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+
+Current Fix:
+```
+print("Average Session Time                               : " + str(averageSessionTime) + " hours")
+```
+
+**Issue on line 2939**
+
+Original:
+```
+if testPrNo > 0:
+```
+
+Error Message: TypeError: '>' not supported between instances of 'str' and 'int'
+
+Current Fix:
+```
+if testPrNo > 0:
+```

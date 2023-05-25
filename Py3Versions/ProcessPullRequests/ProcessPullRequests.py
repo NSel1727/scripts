@@ -2930,13 +2930,13 @@ if __name__ == '__main__':
     print("Use quick build is                                 : " + str(useQuickBuild))
     print("Build ECLWatch is                                  : " + str(buildEclWatch))
     print("Skip draft PR is                                   : " + str(skipDraftPr))
-    print("Average Session Time                               : " + str(averageSessionTime)) + " hours"
+    print("Average Session Time                               : " + str(averageSessionTime) + " hours")
     print("Enable VCPKG build                                 : " + str(enableVcpkgBuild))
     print("Containerised environment                          : " + str(containerisedEnvironment))
     print("Exit when it is a long wait and no PR to test is   : " + str(exitWhenLongWait))
     
     
-    if testPrNo > 0:
+    if int(testPrNo) > 0:
         print("Test PR-" + str(testPrNo) + " only (if it is open) and exit.")
 
     print("\n")
