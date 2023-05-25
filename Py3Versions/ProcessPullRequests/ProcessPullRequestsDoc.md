@@ -143,3 +143,24 @@ Original:
 sysId += '\n Host: ' + myProc.stdout.read().rstrip('\n')
 ```
 
+Error Message:
+"TypeError: a bytes-like object is required, not 'str'"
+
+Current Fix:
+```
+sysId += '\n Host: ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
+```
+
+The issue on line 142 is present on every other line until line 160. The addition of decode('utf-8') is added as well to each.
+
+**Issue on like 148**
+
+This may not be a Python3 issue. 
+
+Original:
+```
+myProc = subprocess.Popen(["cmake --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+sysId += ',  CMake: ' + myProc.stdout.read().decode('utf-8').rstrip('\n').split()[2]
+```
+
+The length of .split() is 0, meaning that what Popen opens is likely empty.

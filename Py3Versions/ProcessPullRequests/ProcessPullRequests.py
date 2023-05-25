@@ -132,32 +132,32 @@ if exitWhenLongWait:
     maxIdleTime /= 2
     
 noEcho = False
-sysId = platform.dist()[0] + ' ' + platform.dist()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
+sysId = platform.uname()[0] + ' ' + platform.uname()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
 
 gitHubToken=None
 curlTimeout=120
 
 if 'inux' in sysId:
     myProc = subprocess.Popen(["hostname"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += '\n Host: ' + myProc.stdout.read().rstrip('\n')
+    sysId += '\n Host: ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
     myProc = subprocess.Popen(["gcc --version | head -n 1 "],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += '\n GCC:  ' + myProc.stdout.read().rstrip('\n')
+    sysId += '\n GCC:  ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
     myProc = subprocess.Popen(["git --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += '\n Git: ' + myProc.stdout.read().rstrip('\n').split()[2]
+    sysId += '\n Git: ' + myProc.stdout.read().decode('utf-8').rstrip('\n').split()[2]
     myProc = subprocess.Popen(["cmake --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += ',  CMake: ' + myProc.stdout.read().rstrip('\n').split()[2]
+    sysId += ',  CMake: ' + myProc.stdout.read().decode('utf-8').rstrip('\n').split()[2]
     myProc = subprocess.Popen(["curl --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += ',  cUrl: ' + myProc.stdout.read().rstrip('\n').split()[1]
+    sysId += ',  cUrl: ' + myProc.stdout.read().decode('utf-8').rstrip('\n').split()[1]
     myProc = subprocess.Popen(["node --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += ',  node.js: ' + myProc.stdout.read().rstrip('\n')
+    sysId += ',  node.js: ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
     myProc = subprocess.Popen(["npm --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += ',  npm: ' + myProc.stdout.read().rstrip('\n')
+    sysId += ',  npm: ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
 
     myProc = subprocess.Popen(["wget -q -t1 -T1 -O - http://169.254.169.254/latest/meta-data/instance-id"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    instanceId = myProc.stdout.read().rstrip('\n')
+    instanceId = myProc.stdout.read().decode('utf-8').rstrip('\n')
     if len(instanceId) == 0:
         myProc = subprocess.Popen(["l=$(readlink /var/lib/cloud/instance); echo ${l##*/}"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-        instanceId = myProc.stdout.read().rstrip('\n')
+        instanceId = myProc.stdout.read().decode('utf-8').rstrip('\n')
         if len(instanceId) == 0:
             instanceId = "NotInCloud"
         
@@ -191,9 +191,9 @@ embededStuffTests = {
                             }
 
 def myPrint(Msg, *Args):
-        if verbose:
-            format=''.join(['%s']*(len(Args)+1)) 
-	    print(format % tuple([Msg]+list(map(str,Args))))
+	if verbose:
+		format=''.join(['%s']*(len(Args)+1)) 
+		print(format % tuple([Msg]+list(map(str,Args))))
 
 def WildGen( testFiles):
     files = []
@@ -1511,7 +1511,7 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
         else:
             resultFile.write("\t"+result+"\n")
         #result = result.replace('\n', '\\n')+"\\n"
-        if type(result) != type(u' '):
+        if type(result) != type(' '):
             result = repr(result).replace('\'', '') #.replace('\\\\','\\')+"\n"
 
         result = result.replace('\n','')
@@ -2033,7 +2033,7 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
 
     msg = msg.replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\n', '\\n').replace('"', '\'') #.replace('\\xc2\\xae', '\xc2\xae')
 
-    if type(msg) == type(u' '):
+    if type(msg) == type(' '):
         msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
         msg = repr(msg)
     else:
@@ -2867,7 +2867,7 @@ def doTest():
         result += "Install ECLWatch build dependencies.\n"
         result += "sudo npm install -g jshint@2.9.4\n"
         result += "res:/usr/bin/jshint -> /usr/lib/node_modules/jshint/bin/jshint\n"
-        result += "+ jshint@2.9.4\N"
+        result += "+ jshint@2.9.4\n"
         result += "updated 1 package in 2.979s\n"
         result += "npm install end.\n"
         result += "npm test\n"
@@ -2877,7 +2877,7 @@ def doTest():
         result += "> eclwatch@1.0.0 lint /mnt/disk1/home/vamosax/smoketest/PR-12233/HPCC-Platform/esp/src\n"
         result += "> jshint --config ./.jshintrc ./eclwatch\n"
         result += "npm test end\n"
-        result += "Makefiles created (2019-02-28_09-07-19 45 sec )\N"
+        result += "Makefiles created (2019-02-28_09-07-19 45 sec )\n"
         result += "Build it\n"
         result += "Install HPCC Platform\n"
 
