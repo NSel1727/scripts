@@ -164,3 +164,5 @@ sysId += ',  CMake: ' + myProc.stdout.read().decode('utf-8').rstrip('\n').split(
 ```
 
 The length of .split() is 0, meaning that what Popen opens is likely empty.
+
+Update: This issue was fixed by installing cmake.
