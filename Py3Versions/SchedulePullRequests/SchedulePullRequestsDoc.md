@@ -11,6 +11,7 @@ Edit:
 print(format % tuple([Msg]+list(map(str,Args))))
 ```
 Suggestion: This edit should be kept.
+Update: This edit was kept.
 
 **Change on line 1576, 2078**
 
@@ -23,6 +24,7 @@ Edit:
 if type(result) != type(' '):
 ```
 Suggestion: The u in type is for unicode, so if it is intended to be in unicode regardless then the edit can stay.
+Update: This edit was not kept
 
 **Change on line 1787, 1791, 1795, 1832, 1837, 1841, 1859, 1862**
 
@@ -34,6 +36,8 @@ Edit:
 ```
 print(str(e)+"(line: "+str(inspect.stack()[0][2])+")")
 ```
+Suggestion: This edit should be kept.
+Update: This edit was kept.
 
 **Change on lines 3357-3361**
 
@@ -54,6 +58,7 @@ Edit:
         result += "/mnt/disk1/home/vamosax/smoketest/smoketest-8652/HPCC-Platform/roxie/ccd/ccdfile.cpp:606:5: error: control reaches end of non-void function [-Werror=return-type]\n"
 ```
 Suggestion: The u in type is for unicode, so if it is intended to be in unicode regardless then the edit can stay.
+Update: This edit was kept.
 
 **Change on line 3384, 3414, 3439, 3448**
 
@@ -66,6 +71,7 @@ Edit:
 msg= 'Automated Smoketest \n  \xe2\x80\x98 Test \xe2\x80\x99 \n'
 ```
 Suggestion: The u in type is for unicode, so if it is intended to be in unicode regardless then the edit can stay.
+Update: This edit was kept.
 
 **Change on line 3571-3574**
 
@@ -84,3 +90,4 @@ traceback.print_exc(file=sys.stdout)
 print('-'*60)
 ```
 Suggestion: This edit should be kept.
+Update: This edit was kept.
