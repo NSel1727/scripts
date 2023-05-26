@@ -125,24 +125,24 @@ doNotUpdate = True
 
 maxIdleTime = 120 # 600 # sec
 noEcho = False
-sysId = platform.dist()[0] + ' ' + platform.dist()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
+sysId = platform.uname()[0] + ' ' + platform.uname()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
 appId = "App"""
 gitHubToken=None
 curlTimeout=120
 
 if 'inux' in sysId:
     myProc = subprocess.Popen(["gcc --version | head -n 1 "], shell=True,  bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    sysId += '\n GCC:  ' + myProc.stdout.read().rstrip('\n')
+    sysId += '\n GCC:  ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
     myProc = subprocess.Popen(["hostname"], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    sysId += '\n Host: ' + myProc.stdout.read().rstrip('\n')
+    sysId += '\n Host: ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
     myProc = subprocess.Popen(["git --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-    sysId += '\n Git:  ' + myProc.stdout.read().rstrip('\n')
+    sysId += '\n Git:  ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
     
     myProc = subprocess.Popen(['ps $PPID | tail -n 1 | awk "{print \$6}"'], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    parentCommand = myProc.stdout.read().rstrip('\n')
+    parentCommand = myProc.stdout.read().decode('utf-8').rstrip('\n')
     
     myProc = subprocess.Popen(['hostname'], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    appId = myProc.stdout.read().rstrip('\n')
+    appId = myProc.stdout.read().decode('utf-8').rstrip('\n')
 
 failEmoji=':x:'
 passEmoji=':white_check_mark:'
@@ -3422,7 +3422,7 @@ def doTest():
         result += "Install ECLWatch build dependencies.\n"
         result += "sudo npm install -g jshint@2.9.4\n"
         result += "res:/usr/bin/jshint -> /usr/lib/node_modules/jshint/bin/jshint\n"
-        result += "+ jshint@2.9.4\N"
+        result += "+ jshint@2.9.4\n"
         result += "updated 1 package in 2.979s\n"
         result += "npm install end.\n"
         result += "npm test\n"
@@ -3432,7 +3432,7 @@ def doTest():
         result += "> eclwatch@1.0.0 lint /mnt/disk1/home/vamosax/smoketest/PR-12233/HPCC-Platform/esp/src\n"
         result += "> jshint --config ./.jshintrc ./eclwatch\n"
         result += "npm test end\n"
-        result += "Makefiles created (2019-02-28_09-07-19 45 sec )\N"
+        result += "Makefiles created (2019-02-28_09-07-19 45 sec )\n"
         result += "Build it\n"
         result += "Install HPCC Platform\n"
 
@@ -3486,11 +3486,11 @@ if __name__ == '__main__':
     print("Use quick build is                                 : " + str(useQuickBuild))
     print("Build ECLWatch is                                  : " + str(buildEclWatch))
     print("Skip draft PR is                                   : " + str(skipDraftPr))
-    print("Average Session Time                               : " + str(averageSessionTime)) + " hours"
+    print("Average Session Time                               : " + str(averageSessionTime) + " hours")
     print("Enable VCPKG build                                 : " + str(enableVcpkgBuild))
     print("Containerised environment                          : " + str(containerisedEnvironment))
     
-    if testPrNo > 0:
+    if int(testPrNo) > 0:
         print("Test PR-" + str(testPrNo) + " only (if it is open) and exit.")
 
     print("\n")

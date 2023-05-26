@@ -91,3 +91,93 @@ print('-'*60)
 ```
 Suggestion: This edit should be kept.
 Update: This edit was kept.
+
+##POST 2to3 CHANGES
+
+**Issue on line 3425**
+
+Original:
+```
+result += "+ jshint@2.9.4\N"
+```
+
+Error Message: "SyntaxError: (unicode error) 'unicodeescape' codec can't decode bytes in position 14-15: malformed \N character escape"
+
+Current Fix:
+```
+result += "+ jshint@2.9.4\n"
+```
+
+**Issue on line 3435**
+
+Original:
+```
+result += "Makefiles created (2019-02-28_09-07-19 45 sec )\N"
+```
+
+Error Message: "SyntaxError: (unicode error) 'unicodeescape' codec can't decode bytes in position 47-48: malformed \N character escape"
+
+Current Fix:
+```
+result += "Makefiles created (2019-02-28_09-07-19 45 sec )\n"
+```
+
+**Issue on line 128**
+
+Original:
+```
+sysId = platform.dist()[0] + ' ' + platform.dist()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
+```
+
+Error Message:
+"AttributeError: module 'platform' has no attribute 'dist'"
+
+Current Fix:
+```
+sysId = platform.uname()[0] + ' ' + platform.uname()[1] + ' (' + platform.system() + ' ' + platform.release() + ')'
+```
+
+**Issue on line 135**
+
+Original:
+```
+sysId += '\n GCC:  ' + myProc.stdout.read().rstrip('\n')
+```
+
+Error Message:
+"TypeError: a bytes-like object is required, not 'str'"
+
+Current Fix:
+```
+sysId += '\n GCC:  ' + myProc.stdout.read().decode('utf-8').rstrip('\n')
+```
+
+The issue on line 135 is present on every other line until line 145. The addition of decode('utf-8') is added as well to each.
+
+**Issue on line 3489**
+
+Original:
+```
+print("Average Session Time                               : " + str(averageSessionTime) + " hours"
+```
+
+Error Message: TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+
+Current Fix:
+```
+print("Average Session Time                               : " + str(averageSessionTime) + " hours")
+```
+
+**Issue on line 3493**
+
+Original:
+```
+if testPrNo > 0:
+```
+
+Error Message: TypeError: '>' not supported between instances of 'str' and 'int'
+
+Current Fix:
+```
+if testPrNo > 0:
+```
