@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-#import system
 import json
 import sys
 import subprocess
@@ -197,7 +196,7 @@ def myPrint(Msg, *Args):
 
 def WildGen( testFiles):
     files = []
-    #if testFiles[0].startswith('testing/regress/ecl/'):
+
     for testName in testFiles:
         if os.sep in testName:
             testName = os.path.basename(testName)
@@ -214,13 +213,13 @@ def WildGen( testFiles):
         ch11 = (files[0][1])
         ch20 = (files[index][0])
         ch21 = (files[index][1])
-        #print "ch10:'"+str(ch10)+"', ch11:'"+str(ch11)+"'"
-        #print "ch20:'"+str(ch20)+"', ch21:'"+str(ch21)+"'"
+        
         # With XOR separate the filenames started with different letter and it is generates a kind of
         # HASH value to separate filenames into clusters/groups
         val = xor(ord(ch10),  ord(ch20))*100 + xor(ord(ch11),  ord(ch21))
-        #print(val)
         id = str(val)
+        
+        # TO DO - Determine if maxlen is a fitting variable name
         if str(val) not in groups:
             groups[id] =  {'files': [],  'mask':'',  'maxlen': 9999}
         groups[id]['files'].append(files[index])
@@ -228,7 +227,7 @@ def WildGen( testFiles):
             groups[id]['maxlen'] = len(files[index])
     
     myPrint(groups)
-    #print '\n\n'
+
     pass
     # If a group has only one element, then this element will be the mask
     # else we try to find the longest common starting string then add a '*' at its end and that will be the mask.
@@ -300,12 +299,12 @@ def CollectResultsOld(logPath, tests):
                             
                         if len(items)  in range (4, 6):
                             # This is a 'Test:' line with ot without version
-                            #testName = items[0]+'.'+items[2].strip()
+
                             testName = items[2].strip()
                             testNameLen = len(testName)
                             if testName not in logs[prefix]:
                                 logs[prefix][testName] = {}
-                            #logs[prefix][testName][target]
+
                         elif 'Fail' in line:
                             logs[prefix][testName][target]= 'Fail'
                         elif 'Pass' in line:
@@ -317,8 +316,8 @@ def CollectResultsOld(logPath, tests):
             result.append("\\n| " + prefix + " | " + targets[0] + " | " + targets[1] + " | " + targets[2] + " |")
             result.append("| ----- | ----- | ----- | ---- |")
             for testname in sorted(logs[prefix],  key=str.lower) :
-                #items = testname.split('.')
-                #line = "%-*s " % (20,  items[1])
+
+
                 line = "| "+ testname + " "
                 
                 for target in targets:
@@ -438,7 +437,7 @@ def CollectResults(logPath, tests, prid=0, isGitHubComment=True):
                             elif inError:
                                 # Add error msg
                                 pass
-                            #logs[prefix][testName][target]
+
                             
                             logs[prefix][testName][target]['index'] = index
                         elif '. Fail' in line:
@@ -458,7 +457,7 @@ def CollectResults(logPath, tests, prid=0, isGitHubComment=True):
                             else:
                                 # zero length line at the end of error log
                                 if len(errMsg):
-                                    #inError=False
+
                                     pass
                                 else:
                                     errMsg.append("no error info")
@@ -497,11 +496,11 @@ def CollectResults(logPath, tests, prid=0, isGitHubComment=True):
                     executed = 0
                     passed = 0
                     failed = 0
-                    #for testname in sorted(logs[prefix],  key=str.lower) :
+
                     for testname in sorted(logs[prefix],  key=str) :
                         if target in logs[prefix][testname]:
                             executed += 1
-                            #print("%3d:%s-%s-%s" % (executed,  prefix,  target, testname))
+                            
                             if logs[prefix][testname][target]['result'] == 'Pass':
                                 passed += 1
                             elif logs[prefix][testname][target]['result'] == 'Fail':
@@ -530,7 +529,7 @@ def CollectResults(logPath, tests, prid=0, isGitHubComment=True):
                     table.addItem('elaps#'+ elapsTimes[prefix][target], '#')
                     table.completteRow()
                     testInfo[target + '_' + prefix + '_time'] = elapsTimes[prefix][target].split()[0]
-                    #print("total:%3d, pass: %3d, fails:%3d\n-----------------------\n" % (executed,  passed,  failed))
+                    
                 pass
             result += table.getTable()
 
@@ -580,8 +579,7 @@ def CollectResults(logPath, tests, prid=0, isGitHubComment=True):
                 errors = ''
                 
                 for testname in sorted(logs[prefix],  key=str.lower) :
-                    #items = testname.split('.')
-                    #line = "%-*s " % (20,  items[1])
+
                     if len(logs[prefix][testname]) == 0:
                         continue
                     if isGitHubComment:
@@ -633,8 +631,7 @@ def ProcessPrBody(bodyText):
             elif 'draft' in m.group(2):
                 retVal['testDraft'] = True
             
-#            print("\t%s" % (str(m.groups())))
-#            retVal[m.group(2)] = m.group(1)
+
             pass
         pass
     return retVal
