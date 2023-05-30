@@ -723,7 +723,7 @@ def GetOpenPulls(knownPullRequests):
         if len(morePages) > 0:
             pulls_data = pulls_data.rstrip(']\n')
             for page in morePages:
-                #pulls_data += pulls_data2
+
                 pulls_data += page
             pulls_data += ']\n'
         pulls = json.loads(pulls_data)
@@ -737,7 +737,7 @@ def GetOpenPulls(knownPullRequests):
         return (prs, buildPr)
     except Exception as ex:
         print("Unable to get pulls "+ str(ex.reason))
-        #print("Result: " + str(result))
+
         # Something bad happened when try to get open pulls data 
         # Empty the knownPullRequest list ot avoid the further processing  
         # they are closed and move them out
@@ -746,7 +746,7 @@ def GetOpenPulls(knownPullRequests):
     finally:
         pass
 
-    #print(pulls)
+
     # It can be determine if a PR mergeable or not in two steps:
     # 1. wget -OpullRequest<PRID>.json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls/<PRID>
     # 2. cat pullRequest<PRID>.json | grep -i 'mergeable"'
@@ -786,11 +786,10 @@ def GetOpenPulls(knownPullRequests):
         if ('draft' in pr) and (skipDraftPr == False) and not prs[prid]['checkBoxes']['testDraft']:
             prs[prid]['draft'] = pr['draft']
         
-        #prs[prid]['cmd'] = 'git fetch -ff upstream pull/'+str(prid)+'/head:'+repr(pr['head']['ref'])+'-smoketest'
 
         # 2018-05-02 -ff fall back to interactive, forbid it with --no-edit parameter.
         # It can be git/github or master branch problem and not Smoketest, but solved here
-        #prs[prid]['cmd'] = 'git pull -ff upstream pull/'+str(prid)+'/head:'+repr(pr['head']['ref'])+'-smoketest'
+        
         prs[prid]['cmd'] = 'git pull -ff --no-edit upstream pull/'+str(prid)+'/head:' +  prs[prid] ['prBranchId'] 
 
         # On some version of git there is not "--no-edit" parameter like in OBT-011 system
@@ -886,14 +885,7 @@ def GetOpenPulls(knownPullRequests):
         isBuilt = False
         if os.path.exists(buildSummaryFileName):
             isBuilt=True
-            # The result of this code block never used, remove 
-#            buildSummaryFile = open(buildSummaryFileName, 'r')
-#            buildSummary = buildSummaryFile.readlines()
-#            buildSummaryFile.close()
-#            for line in buildSummary:
-#                if "Build success" in line:
-#                    buildSuccess = True
-#                    break
+            
                     
         if isBuilt and (testPrNo == str(prid)):
             # Force to rebuild and retest
@@ -931,11 +923,8 @@ def GetOpenPulls(knownPullRequests):
                 prs[prid]['reason']="Forced to re-test"
             else:
                 newPRs += 1
-            #print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+' sheduled to testing ('+prs[prid]['reason']+')')
-    
-            # generates changed file list:
-            # wget -O<PRID>.diff https://github.com/hpcc-systems/HPCC-Platform/pull/<PRID>.diff
-            #myProc = subprocess.Popen(["wget --timeout=60 -O"+testDir+"/"+str(prid)+".diff https://github.com/hpcc-systems/HPCC-Platform/pull/"+str(prid)+".diff"],  shell=True,  bufsize=65536,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+
+
             # With curl
             myProc = subprocess.Popen(["curl -L --connect-timeout 60 -o"+testDir+"/"+str(prid)+".diff https://github.com/hpcc-systems/HPCC-Platform/pull/"+str(prid)+".diff"],  shell=True,  bufsize=65536,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
             # The myProc.stdout.read() hanged if there was a large (> 40MB) diff file to get.
@@ -963,7 +952,6 @@ def GetOpenPulls(knownPullRequests):
             #prs[prid]['excludeFromTest'] = any([True for x in prs[prid]['files'] if ('^helm/' in x ) or ('^dockerfiles/' in x) or ('.github/' in x)] )
             
             # Do we really consider any GH Action (changes) as a containerised envireonment?
-            #excludePaths = ['helm/', 'dockerfiles/', '.github/', 'testing/helm/', 'MyDockerfile/'] 
             excludePaths = ['helm/', 'dockerfiles/', 'testing/helm/', 'MyDockerfile/']
             
             #prs[prid]['excludeFromTest'] = any([True for x in prs[prid]['files'] if any( [True for y in excludePaths if x.startswith(y) ])] )
@@ -1108,15 +1096,13 @@ def GetOpenPulls(knownPullRequests):
             if isBuilt:
                 os.unlink(buildSummaryFileName)
                 
-            #if prs[prid]['isDocsChanged']: # and not os.path.exists(buildSummaryFileName):
-                # buildSummaryFile = open(buildSummaryFileName,  "wb")
-                # buildSummaryFile.write( "Only documentation changed! Don't build." )
-                # buildSummaryFile.close()
-                # print("In PR-"+str(prid)+", label: "+prs[prid]['label']+" only documentation changed! Don't sheduled to testing ")
+
+
 
             prs[prid]['inQueue'] = True
             buildPr += 1
-            #print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+" scheduled to testing (reason:'"+prs[prid]['reason']+"', is DOCS changed:"+str(prs[prid]['isDocsChanged'])+")")
+            
+            
             print("Build PR-%s, label: %s scheduled to testing (reason:'%s', is DOCS changed: %s, is ECLWatch build: %s, is Containerized: %s)" % (str(prid), prs[prid]['label'], prs[prid]['reason'], str(prs[prid]['isDocsChanged']), str(prs[prid]['buildEclWatch']),  str(prs[prid]['containerized']) ))
             pass
             
@@ -1149,7 +1135,7 @@ def GetOpenPulls(knownPullRequests):
         if prs[pr]['inQueue']:
             queue[pr] = prs[pr]
             
-    #return (prs, buildPr)
+
     return (queue, buildPr)
 
 def CleanUpClosedPulls(knownPullRequests, smoketestHome):
