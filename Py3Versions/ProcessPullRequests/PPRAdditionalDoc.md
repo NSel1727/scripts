@@ -219,5 +219,3 @@ Line 2824: "# processResult(result,  msg,  resultFile,  buildFailed=False,  test
 Line 2914-1915: "#smoketestHome = os.getcwd()
         	 #knownPullRequests = glob.glob("smoketest-*") + glob.glob("PR-*")"
         	 
-
-        

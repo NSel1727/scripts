@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-#import system
+
 import json
 import sys
 import subprocess
@@ -147,7 +147,7 @@ if 'inux' in sysId:
 failEmoji=':x:'
 passEmoji=':white_check_mark:'
 
-#testInfo = {}
+
 threads = {}
 
 embededStuffTests = {
@@ -198,12 +198,11 @@ def WildGen( testFiles):
         ch11 = (files[0][1])
         ch20 = (files[index][0])
         ch21 = (files[index][1])
-        #print "ch10:'"+str(ch10)+"', ch11:'"+str(ch11)+"'"
-        #print "ch20:'"+str(ch20)+"', ch21:'"+str(ch21)+"'"
+
         # With XOR separate the filenames started with different letter and it is generates a kind of
         # HASH value to separate filenames into clusters/groups
         val = xor(ord(ch10),  ord(ch20))*100 + xor(ord(ch11),  ord(ch21))
-        #print(val)
+
         id = str(val)
         if str(val) not in groups:
             groups[id] =  {'files': [],  'mask':'',  'maxlen': 9999}
@@ -212,7 +211,7 @@ def WildGen( testFiles):
             groups[id]['maxlen'] = len(files[index])
     
     myPrint(groups)
-    #print '\n\n'
+
     pass
     # If a group has only one element, then this element will be the mask
     # else we try to find the longest common starting string then add a '*' at its end and that will be the mask.
@@ -284,12 +283,12 @@ def CollectResultsOld(logPath, tests):
                             
                         if len(items)  in range (4, 6):
                             # This is a 'Test:' line with ot without version
-                            #testName = items[0]+'.'+items[2].strip()
+
                             testName = items[2].strip()
                             testNameLen = len(testName)
                             if testName not in logs[prefix]:
                                 logs[prefix][testName] = {}
-                            #logs[prefix][testName][target]
+
                         elif 'Fail' in line:
                             logs[prefix][testName][target]= 'Fail'
                         elif 'Pass' in line:
@@ -301,8 +300,7 @@ def CollectResultsOld(logPath, tests):
             result.append("\\n| " + prefix + " | " + targets[0] + " | " + targets[1] + " | " + targets[2] + " |")
             result.append("| ----- | ----- | ----- | ---- |")
             for testname in sorted(logs[prefix],  key=str.lower) :
-                #items = testname.split('.')
-                #line = "%-*s " % (20,  items[1])
+
                 line = "| "+ testname + " "
                 
                 for target in targets:
@@ -407,8 +405,7 @@ def CollectResults(logPath, tests, prid=0, isGitHubComment=True):
                                     pass
                                 errMsg = []
                                 
-                            # This is a 'Test:' line
-                            #testName = items[0]+'.'+items[2].strip()
+
                             if 'version' in items[3]:
                                 testName = items[2].strip() +' ('+''.join(items[4:]).strip().replace(' )', ')')
                                 testNameLen = len(testName)
