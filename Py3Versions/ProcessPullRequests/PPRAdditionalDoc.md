@@ -33,3 +33,11 @@ Lines 582-583: "#items = testname.split('.')
                	
 Lines 634-635: "#print("\t%s" % (str(m.groups())))
 		 #retVal[m.group(2)] = m.group(1)"
+		 
+Lines 677-678 & 689-690: "# Using wget (problems on Replacement MFA machines)"
+"#myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests.json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)"
+
+Lines 712-714: "#myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests"+str(page)+".json https://api.github.com/repositories/2030681/pulls?page="+str(page)],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)"
+                "# Using wget (problems on Replacement MFA machines)"
+                "#myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests"+str(page)+".json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls?page="+str(page)], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # Using curl"
