@@ -148,7 +148,7 @@ class GistLogHandler(object):
         tryCount = 5
         while (True):
             result = self.execCmd(cmd)
-            #print("\tresult:"+result + "\n")
+
             if result[1]['returncode'] != 0:
                 tryCount -=1
                 if tryCount > 0:
@@ -169,14 +169,10 @@ class GistLogHandler(object):
         os.chdir(self.distDir)
         
         # Set origin to push
-        # git remote set-url origin https://gist.github.com/HPCCSmoketest/<gist_id>
-        #cmd = 'git remote set-url origin  https://gist.github.com/HPCCSmoketest/'+ self.id
-        # https://gist.github.com/3b01b4185f6919e4f47ff66a06ad8588.git
-        #cmd = 'git remote set-url origin  git@gist.github.com:'+ self.id + '.git'
-        #cmd = 'git remote set-url origin  https://' + self.token + '@gist.github.com/HPCCSmoketest/'+ self.id
+
         cmd = 'git remote set-url origin https://' + self.token + '@gist.github.com/'+ self.id
         result = self.execCmd(cmd)
-        #print("\tresult:"+result + "\n")
+
         
         os.chdir(self.curDir)
         pass
@@ -188,7 +184,6 @@ class GistLogHandler(object):
         # git add <filename>
         cmd = 'git add "' + filename + '"'
         result = self.execCmd(cmd)
-        #print("\tresult:"+result + "\n")
         
         os.chdir(self.curDir)
           
@@ -216,7 +211,6 @@ class GistLogHandler(object):
             # copy ./CMake* file to gists/.
             cmd = 'cp ' + cMakeResultFilesPath + cMakeResultFileName + ' "gists/' + cMakeResultFileName + '"'
             result = self.execCmd(cmd)
-            #print("\tresult:"+result + "\n")
             
             # Add CMake result file to git
             self.gistAddFile(cMakeResultFileName)
@@ -286,7 +280,6 @@ class GistLogHandler(object):
             # copy /HPCCSystems-regression/zap/<zapfile> to gists/.
             cmd = 'cp ' + zapFilePath + zapFileName + ' "gists/' + testname + '-' + zapFileName + '"'
             result = self.execCmd(cmd)
-            #print("\tresult:"+result[0] + "\n")
             
             # Add zapfile to git
             self.gistAddFile(testname + '-' + zapFileName)
@@ -358,14 +351,7 @@ class GistLogHandler(object):
         #print("\tresult:"+result[0] + "\n")
        
         os.chdir(self.curDir)
-        
-        # save id
-#        if os.path.exists( 'messageId.dat'):
-#            file = open('messageId.dat' ,  "r") 
-#            line = file.readline()
-#            file.close()
-#            gistsIdFileName= line.strip().replace('\n','') + '.dat'
-#        else:
+       
         
 
         gistFile = open(self.gistsIdFileName,  "a")
