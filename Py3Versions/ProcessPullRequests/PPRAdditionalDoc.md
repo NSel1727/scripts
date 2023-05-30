@@ -75,3 +75,149 @@ Lines 1099-1103: "#if prs[prid]['isDocsChanged']: # and not
 Line 1107: "#print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+" scheduled to testing (reason:'"+prs[prid]['reason']+"', is DOCS changed:"+str(prs[prid]['isDocsChanged'])+")")"
 
 Line 1138: "#return (prs, buildPr)"
+
+Lines 1298-1301: "  # Smoketest has no right to push
+		    # print("\tgit push origin master")
+		    # myProc = subprocess.Popen(["git push origin master"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+		    # result = formatResult(myProc)
+		    "
+		
+Lines 1313-1329: "#        myProc = subprocess.Popen(["ecl --version"],  		shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+		#        result = myProc.stdout.read() + myProc.stderr.read()
+		#        #results = result.split('\n')
+		#        print("\t"+result)
+
+		#        # Get the latest Regression Test Engine
+		#        print("\tGet the latest Regression Test Engine from the master branch")
+		#        myProc = subprocess.Popen(["git checkout master"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+		#        formatResult(myProc)
+		#        
+		#        if not os.path.exists('../rte'):
+		#            os.mkdir('../rte')
+		#        
+		#        myProc = subprocess.Popen(["cp -v testing/regress/ecl-test* ../rte/"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+		#        formatResult(myProc)
+		#        myProc = subprocess.Popen(["cp -v -r testing/regress/hpcc ../rte/hpcc"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+		#        formatResult(myProc)"
+		
+Lines 1325-1327: "#    err = Error("6002")
+		  #    logging.error("%s. checkHpccStatus error:%s!" % (1,  err))
+		  #    raise Error(err)"
+
+Lines 1311 - 1313: "#    err = Error("6003")
+    		    #    logging.error("%s. checkHpccStatus error:%s!" % (1,  err))
+    		    #    raise Error(err)"	
+    		    
+Line 1346: "#tableItems=[]"
+
+Line 1392: "#values ="|""
+
+Line 1482: "#result = result.replace('\n', '\\n')+"\\n""
+
+Lines 1611-1612: " #msg +=  '\n' + buildErrorStr + '\n'
+                   #buildFailed=False"
+                   
+Line 1615: " # eclWatchBuild = False"
+
+Line 1657: " #buildFailed =  True"
+
+Lines 1807-1808: "# Suite Error
+		  # print("\tSuite Error"+result)"
+		  
+Line 1854: "#msg += result.replace('stopped',  'stopped,').replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace("\\", "").replace('\<','<').replace('/>','>').replace('\xc2\xae','').replace('/*', '*').replace('*/', '*')" 
+
+Line 1860: "#print(", "+result)"
+
+Line 1875: "#eclWatchBuildError += result + '\n'"
+
+Line 1899: " #eclWatchBuild=True"
+
+Lines 1904-1908: "# msg += eclWatchTable.getTable()
+		  # msg += '\n'
+		  # if len(npmTestResultErr) > 0:
+		  # 	print(npmTestResultErr)
+		  #     msg += npmTestResultErr + '\n'"
+
+Lines 1913-1915: "# items = result.split()
+		  # eclWatchTable.addItem("lint " + items[1]+':'+items[0])
+		  # #npmTestResult += 'Error(s): \n'"
+
+Lines 1950-1952: "# That was a vertical table, I think it is too big.
+                  #timeStatsTable.addItem('Stage:' + items[0].replace(' time', '').strip() )
+                  #timeStatsTable.addItem('Time: ' + items[1], ': ')"   
+                  
+Lines 1958-1960: "#        if len(msg) > maxMsgLen:
+		  #            # Too much messsages something really wrong
+		  #            break"
+		  
+Line 1992: "#.replace('\\xc2\\xae', '\xc2\xae')" 
+**Note**: This is commented out of the end of "msg = msg.replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\n', '\\n').replace('"', '\'')"
+
+Line 2017: "#curDir =  os.getcwd()"
+ 
+Line 2064: "#testDir = "smoketest-"+str(prid)"
+
+Lines 2112-2116: "#resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
+		#            resultFile.write("------------------------------------------------------\n")
+		#            resultFile.write(addCommentCmd+"\n")
+		#            resultFile.write("------------------------------------------------------\n")
+		#            if addGitComment:"
+
+Line 2135, 2146, 2154, 2162, 2245, 2444: "#resultFile.write("\tresult:"+result+"\n")"
+
+Line 2264: "#result = formatResult(myProc, resultFile,  noEcho)"
+
+Lines 2295-2296: " #resultFile.write("\tscl enable devtoolset-2 "+os.getcwd()+"/build.sh " + prs[prid]['regSuiteTests'] + "\n")
+                   #myProc = subprocess.Popen(["scl enable devtoolset-2 "+os.getcwd()+"/build.sh " + prs[prid]['regSuiteTests'] ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)"
+                   
+Line 2312: "#myProc = subprocess.Popen(["./build.sh " + prs[prid]['regSuiteTests']  ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)"
+
+Lines 2317-2318: "#myStdout = myProc.stdout.read()
+                #myStderr = myProc.stderr.read()"
+     
+
+Line 2338: "#print("\t"+result)"
+
+Lines 2357-2358: " #while ( msg[maxMsgLen-1] == '\\' ):
+                     #    maxMsgLen -= 1
+                     
+Line 2378: "#msg = msg.replace('stopped',  'stopped,').replace("\\", "").replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\xc2\xae','')"
+
+Lines 2382-2385: "#resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
+				#            resultFile.write("------------------------------------------------------\n")
+				#            resultFile.write(addCommentCmd+"\n")
+				#            resultFile.write("------------------------------------------------------\n")"
+				
+Lines 2383-2387: "#            if addGitComment:
+			    uploadGitHubComment(addCommentCmd,  resultFile)
+		#            else:
+		#                msgId = MessageId(resultFile)
+		#                msgId.addNewFromResult(result)"
+**Note:** "uploadGitHubComment(addCommentCmd,  resultFile)" is not commented.
+
+Lines 2459-2460: "#if not isBuild and os.path.exists(resultFileName):
+		  #os.unlink(resultFileName)"
+		  
+Lines 2595-2597: "#result = myProc.stdout.read() + myProc.stderr.read()
+		  #print("\t"+result)
+		  #resultFile.write("\tresult:"+result+"\n")"
+		  
+Lines 2669-2679: "#        oldPRsDir='OldPrs'
+		#        if not os.path.exists(oldPRsDir):
+		#                os.mkdir(oldPRsDir)
+		#                
+		#        print("\nMove old PRs (>30 days) into " + oldPRsDir +" directory.")
+		#        #  find . -maxdepth 1 -type d -ctime +30 ! -name HPCC-Platform ! -name OldPrs -exec mv  '{}' OldPrs/. \;
+		#        # Move all directory which is older than 30 days, but not HPCC-Platform or OldPrs to OldPrs directory
+		#        myProc = subprocess.Popen(["find . -maxdepth 1 -type d -mtime +30 ! -name HPCC-Platform ! -name 'Old*' -print -exec mv '{}' "+ oldPRsDir +"/. \;"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+		#        (myStdout,  myStderr) = myProc.communicate()
+		#        result = myStdout+ myStderr
+		#        print("Result:"+result)"
+		
+Line 2824: "# processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=False,  testfiles=None,"
+
+Line 2914-1915: "#smoketestHome = os.getcwd()
+        	 #knownPullRequests = glob.glob("smoketest-*") + glob.glob("PR-*")"
+        	 
+
+        
