@@ -234,8 +234,155 @@ Lines 2524-2528: "#    # Generate fake build.summary for testing purpose only
 			#    buildSummaryFile = open(buildSummaryFileName,  "wb")
 			#    buildSummaryFile.write('Build: success\n')
 			#    buildSummaryFile.close()"
-			
-Line 2578: "#testDir = "smoketest-"+str(prid)"
+	
+Line 2531-2561: "# Notify PRs behind this about their position in the queue
+        	 # Get the index of the current
+        	 # If there are more
+        	 #  Loop from the next to the end and uploadGitHubComment() with position message
+#        index = sortedPrs.index(prid) # This is the current PR
+#        
+#        if index < numOfPrToTest - 1:
+#            curDir =  os.getcwd()
+#            prIndexInQueue = 1
+#            esimatedWaitingTime = prs[sortedPrs[index]]['sessionTime'] # time to complette current task
+#            for prIndex in range(index+1, numOfPrToTest):
+#                prIdInQueue = sortedPrs[prIndex]
+#                if prs[prIdInQueue]['inQueue']:
+#                    msg = "This PR (%d) is in the %d/%d position of the queue. Estimated start time is after ~%.2f hour(s)" % ( sortedPrs[prIndex], prIndexInQueue, numOfPrToTest - index - 1, esimatedWaitingTime)
+#                    esimatedWaitingTime += prs[prIdInQueue]['sessionTime']
+#                    
+#                    if prs[prIdInQueue]['checkBoxes']['notification']:
+#                        print ("notify to %d (PR-%d)" % (prIndexInQueue, sortedPrs[prIndex]))
+#                        print ("\t%s" % (msg) )
+#                        
+#                        addCommentCmd = prs[prIdInQueue]['addComment']['cmd'] +'\'{"body":"'+msg+'"}\' '+prs[prIdInQueue]['addComment']['url']
+#                        # Change to PR directory to store message ID into messageID.dat to allow to remove it after a new comment added
+#                        testInQueueDir = prs[prIdInQueue]['testDir']
+#                        os.chdir(testInQueueDir)
+#                        uploadGitHubComment(addCommentCmd)
+#                        
+#                        # Go back the oribinal directory
+#                        os.chdir(curDir)
+#                    else:
+#                        print ("do not notify to %d (PR-%d)" % (prIndexInQueue, sortedPrs[prIndex]))
+#                        print ("\t%s" % (msg) )
+#                        
+#                    prIndexInQueue += 1"
+
+Line 2563-2674: "# Not necessary, because build will be happened on the AWS instance
+#            print("\tcp -r HPCC-Platform %s" % (testDir))
+#            resultFile.write("\tcp -r HPCC-Platfrom %s\n" % (testDir))
+#            myProc = subprocess.Popen(["cp -fr ../HPCC-Platform ."],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#            result = formatResult(myProc, resultFile)
+#            #resultFile.write("\tresult:"+result+"\n")
+#
+#            # cd smoketest-<PRID>/HPCC-Platform
+#            os.chdir('HPCC-Platform')
+#            # Get PR branch
+#               
+#            # git remote add upstream git@github.com:hpcc-systems/HPCC-Platform.git
+#            print("\tAdd upstream")
+#            resultFile.write("\tAdd upstream\n")
+#            myProc = subprocess.Popen(["git remote add upstream https://" + gitHubToken + "@github.com/hpcc-systems/HPCC-Platform.git"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#            result = formatResult(myProc, resultFile)
+#            #resultFile.write("\tresult:"+result+"\n")
+#
+#            # Checkout base branch
+#            s = "\tbase : %s" % (prs[prid]['code_base'])
+#            print(s)
+#            resultFile.write(s + '\n')
+#            myProc = subprocess.Popen("git checkout -f "+prs[prid]['code_base'],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#            result = formatResult(myProc, resultFile)
+#            #resultFile.write("\tresult:"+result+"\n")
+#                
+#            # Pull the branch
+#            # git fetch upstream pull/<'number'>/head:<'label'>+'-smoketest'
+#            print("\t"+prs[prid]['cmd'])
+#            resultFile.write("\tPull\n")
+#            resultFile.write("\t"+prs[prid]['cmd']+"\n")
+#            myProc = subprocess.Popen(prs[prid]['cmd'],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#            (result, retcode) = formatResult(myProc, resultFile)
+#            if retcode != 0:
+#                if 'unknown option' in result:
+#                    print("\tThere was a problem with prevoius command, try an alternative one")
+#                    print("\t"+prs[prid]['cmd2'])
+#                    myProc = subprocess.Popen(prs[prid]['cmd2'],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#                    (result, retcode) = formatResult(myProc, resultFile)
+#                
+#            if retcode != 0:
+#                noBuildReason = "Error in git command, should skip build and test."
+#            else:    
+#                # Status
+#                print("\tgit status")
+#                resultFile.write("\tgit status\n")
+#                myProc = subprocess.Popen("git status",  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#                result = formatResult(myProc, resultFile)
+#                noBuildReason = ""
+#            
+#            if ('Unmerged paths:' in result) or (retcode != 0):
+#                # There is some conflict on this branch, I think it is better to skip build and test
+#                if noBuildReason  == "":
+#                    noBuildReason = "Conflicting files, should skip build and test."
+#                print(noBuildReason)
+#                # TO-DO Should find out how to handle this situation
+#                isBuild = False
+#                
+#                # generate build.summary file
+#                os.chdir("../")
+#                buildSummaryFileName = 'build.summary'
+#                buildSummaryFile = open(buildSummaryFileName,  "wb")
+#                buildSummaryFile.write(noBuildReason+'\n')
+#                buildSummaryFile.write(result)
+#                buildSummaryFile.close()
+#                msg = "In PR-%s , label: %s : %s" % (str(prid), prs[prid]['label'], noBuildReason) 
+#                print(msg)
+#                resultFile.write(msg + "\n")
+#                
+#                msg = "Delete source directory to save disk space %s (%s)." % (testDir, prs[prid]['label'])
+#                print (msg)
+#                resultFile.write(msg + "\n")
+#                myProc = subprocess.Popen(["sudo rm -rf HPCC-Platform"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#                result = formatResult(myProc, resultFile)
+#            
+#                pass
+#            
+#            else:
+#
+#                # Update submodule
+#                if prs[prid]['newSubmodule']:
+#                    cmd = "git submodule update --init --recursive"
+#                else:
+#                    cmd = "git submodule update --init --recursive"
+#                print("\t" + cmd)
+#                resultFile.write("\t" + cmd + "\n")
+#                myProc = subprocess.Popen([cmd],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#                result = formatResult(myProc, resultFile)
+#                #resultFile.write("\tresult:"+result+"\n")
+#
+#                #  git log -1 | grep '^[c]ommit' | cut  -d' ' -s -f2 >commit.crc
+#                
+#                # Check build directory
+#                os.chdir("../")
+#                if not os.path.exists('build'):
+#                    print("\tCreate build directory.")
+#                    os.mkdir('build')
+#                
+#            # Check HPCCSystems-regression directory and if it exists, archive it
+#            if os.path.exists('HPCCSystems-regression'):
+#                print("\tArchieve HPCCSystems-regression directory.")
+#                regressionZipFileName = 'HPCCSystems-regression-' + curTime
+#                zipCmd="zip -m %s -r HPCCSystems-regression/*" % (regressionZipFileName)
+#                print("\t%s" % (zipCmd))
+#                resultFile.write("\t%s" % (zipCmd))
+#                myProc = subprocess.Popen([ zipCmd ],  shell=True,  bufsize=-1,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+#                try:
+#                    #result = formatResult(myProc, resultFile,  noEcho)
+#                    result = formatResult(myProc, open(regressionZipFileName+'.log',  'w'), noEcho)
+#                except:
+#                    pass
+#                "
+	
+Line 2688: "#testDir = "smoketest-"+str(prid)"
 
 Line 2584-2586: "#        curTime = time.strftime("%y-%m-%d-%H-%M-%S")
 		 #        resultFileName= "scheduler-" + curTime + ".log"

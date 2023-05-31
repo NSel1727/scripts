@@ -881,12 +881,10 @@ def GetOpenPulls(knownPullRequests):
         
         #check build.summary file
         buildSummaryFileName = os.path.join(testDir, 'build.summary')
-#        buildSuccess= False
         isBuilt = False
         if os.path.exists(buildSummaryFileName):
             isBuilt=True
-            
-                    
+                        
         if isBuilt and (testPrNo == str(prid)):
             # Force to rebuild and retest
             isBuilt = False
@@ -1260,21 +1258,7 @@ def CatchUpMaster():
             print("\tgit fetch upstream")
             myProc = subprocess.Popen(["git fetch upstream"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
             formatResult(myProc)
-            
-            #Add these
-            # git config --global user.name "HPCCSmoketest"
-            # git config --global user.email "hpccsmoketest@gmail.com"
-            #Intern Suggestion:
-            """
-            print("\tgit config --global user.name 'HPCCSmoketest'")
-            myProc = subprocess.Popen(["git config --global user.name
-           \"HPCCSmoketest\""],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            formatResult(myProc)
-            
-            print("\tgit config --global user.name 'HPCCSmoketest'")
-            myProc = subprocess.Popen(["git config --global user.email 				 \"hpccsmoketest@gmail.com\""],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            formatResult(myProc)
-            """
+
         else:   
             # Catch up
             print("\tUpdate HPCC-Platform.")
