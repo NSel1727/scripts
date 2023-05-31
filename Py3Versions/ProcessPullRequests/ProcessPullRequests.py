@@ -2880,7 +2880,7 @@ if __name__ == '__main__':
     if isClangTidy:
         print("The clang-tidy is installed and use to check c* code.")
     else:
-        print("The clang-tidy is not istalled.")
+        print("The clang-tidy is not installed.")
 
     #Change to smoketest
     cwd = os.getcwd()
