@@ -343,12 +343,10 @@ class GistLogHandler(object):
         # git commit 
         cmd = 'git commit -a -s -m "Add logs and ZAPs"'
         result = self.execCmd(cmd)
-        #print("\tresult:"+result[0] + "\n")
         
         # git push 
         cmd = 'git push origin main'
         result = self.execCmd(cmd)
-        #print("\tresult:"+result[0] + "\n")
        
         os.chdir(self.curDir)
        
@@ -363,7 +361,6 @@ class GistLogHandler(object):
         gistsZipFileName = self.gistsIdFileName.replace('.dat','-' + curTime + '.zip')
         cmd = "zip " + gistsZipFileName + " -m -r gists"
         result = self.execCmd(cmd)
-        #print("\tresult:"+result[0] + "\n")
 
     def removeGists(self, removeAll = False):
         try:
