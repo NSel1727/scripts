@@ -204,37 +204,37 @@ Lines 2399-2401: "# Avoid orphan escape '\' char.
             	  #while ( msg[maxMsgLen-1] == '\\' ):
             	  #    maxMsgLen -= 1"
             	  
-Line 2336: "#msg = msg.replace('stopped',  'stopped,').replace("\\", "").replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\xc2\xae','')"
+Line 2423: "#msg = msg.replace('stopped',  'stopped,').replace("\\", "").replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\xc2\xae','')"
 
-Lines 2340-2348: "	#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
+Lines 2428-2432: "	#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
 			#            resultFile.write("------------------------------------------------------\n")
 			#            resultFile.write(addCommentCmd+"\n")
 			#            resultFile.write("------------------------------------------------------\n")
-			#            if addGitComment:
-				    uploadGitHubComment(addCommentCmd,  resultFile)
-			#            else:
+			#            if addGitComment:"
+
+Lines 2434-2436:"	#            else:
 			#                msgId = MessageId(resultFile)
 			#                msgId.addNewFromResult(result)"
 			
-Lines 2411-2412: "#if not isBuild and os.path.exists(resultFileName):
+Lines 2510-2511: "#if not isBuild and os.path.exists(resultFileName):
 			#os.unlink(resultFileName)"
 			
-Line 2435: "#startTimestamp = time.time()"
+Line 2536: "#startTimestamp = time.time()"
 
-Line 2448: "#resultFile.write(msg + "\n")"
+Line 2549: "#resultFile.write(msg + "\n")"
 
-Lines 2482-2485: "#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
+Lines 2583-2588: "#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
 		  #            resultFile.write("------------------------------------------------------\n")
 		  #            resultFile.write(addCommentCmd+"\n")
 		  #            resultFile.write("------------------------------------------------------\n")"
 		  
-Lines 2524-2528: "#    # Generate fake build.summary for testing purpose only
+Lines 2628-2632: "#    # Generate fake build.summary for testing purpose only
 			#    buildSummaryFileName = smoketestHome + '/' + threading.current_thread().name + '/build.summary'
 			#    buildSummaryFile = open(buildSummaryFileName,  "wb")
 			#    buildSummaryFile.write('Build: success\n')
 			#    buildSummaryFile.close()"
 	
-Line 2531-2561: "# Notify PRs behind this about their position in the queue
+Line 2654-2684: "# Notify PRs behind this about their position in the queue
         	 # Get the index of the current
         	 # If there are more
         	 #  Loop from the next to the end and uploadGitHubComment() with position message
@@ -268,7 +268,7 @@ Line 2531-2561: "# Notify PRs behind this about their position in the queue
 #                        
 #                    prIndexInQueue += 1"
 
-Line 2563-2674: "# Not necessary, because build will be happened on the AWS instance
+Line 2742-2853: "# Not necessary, because build will be happened on the AWS instance
 #            print("\tcp -r HPCC-Platform %s" % (testDir))
 #            resultFile.write("\tcp -r HPCC-Platfrom %s\n" % (testDir))
 #            myProc = subprocess.Popen(["cp -fr ../HPCC-Platform ."],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
@@ -383,11 +383,11 @@ Line 2563-2674: "# Not necessary, because build will be happened on the AWS inst
 	
 Line 2688: "#testDir = "smoketest-"+str(prid)"
 
-Line 2584-2586: "#        curTime = time.strftime("%y-%m-%d-%H-%M-%S")
+Line 2694-2696: "#        curTime = time.strftime("%y-%m-%d-%H-%M-%S")
 		 #        resultFileName= "scheduler-" + curTime + ".log"
 		 #        resultFile = open(resultFileName,  "a", 0)"
 		 
-Lnes 2591-2601: "#            # Ensure to report and use the lastes commit id
+Lnes 2704-2714: "#            # Ensure to report and use the lastes commit id
 		#            msg = "\tGet the current commit id for PR-%d" % (prid)
 		#            print(msg)
 		#            resultFile.write(msg + "\n")            
@@ -399,27 +399,27 @@ Lnes 2591-2601: "#            # Ensure to report and use the lastes commit id
 		#                outFile.close()# store commit crc
 		#            "
 		
-Lines 2602-2607: "#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
+Lines 2723-2728: "#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
 		#            resultFile.write("------------------------------------------------------\n")
 		#            resultFile.write(addCommentCmd+"\n")
 		#            resultFile.write("------------------------------------------------------\n")
 		#            if addGitComment:
 			    #uploadGitHubComment(addCommentCmd,  resultFile)"
 			    
-Lines 2608-2610: "#            resultFile.write("%d/%d. Process PR-%s, label: %s\n" % ( prSequnceNumber, numOfPrToTest, str(prid), prs[prid]['label']))
+Lines 2734-2736: "#            resultFile.write("%d/%d. Process PR-%s, label: %s\n" % ( prSequnceNumber, numOfPrToTest, str(prid), prs[prid]['label']))
 		#            resultFile.write("\ttitle: %s\n" % (repr(prs[prid]['title'])))
 		#            resultFile.write("\tsha  : %s\n" % (prs[prid]['sha']))
 			    "
 			    
-Line 2758: "#cmd += " -tests='" + prs[prid]['regSuiteTests'] + "'""
+Line 2889: "#cmd += " -tests='" + prs[prid]['regSuiteTests'] + "'""
 
-Lines 2761-2765: "#                    cmd += " -unittest=" + str(prs[prid]['runUnittests'])
+Lines 2892-2896: "#                    cmd += " -unittest=" + str(prs[prid]['runUnittests'])
 		  #                    cmd += " -wuttest=" + str(prs[prid]['runWutoolTests'])
 		  #                    cmd += " -buildEclWatch=" + str(prs[prid]['buildEclWatch'])
 		  #                    cmd += " -keepFiles=" + str(keepFiles)
 		  #                    cmd += " -enableStackTrace=" + str(prs[prid]['enableStackTrace'])"
 		
-Lines 2789-2794: "#                #myStdout = myProc.stdout.read()
+Lines 2924-2929: "#                #myStdout = myProc.stdout.read()
 		  #                #myStderr = myProc.stderr.read()
 		  #                result = myStdout
 				
@@ -427,11 +427,11 @@ Lines 2789-2794: "#                #myStdout = myProc.stdout.read()
 		  #                    result += myStderr
 			    "
 			    
-Lines 3067-3069: "#                    result = myProc.stdout.read() + myProc.stderr.read()
+Lines 3209-3212: "#                    result = myProc.stdout.read() + myProc.stderr.read()
 		  #                    print("\t"+result)
 		  #                    resultFile.write("\tresult:"+result+"\n")"
 		  
-Lines 3141-3151: "#        oldPRsDir='OldPrs'
+Lines 3285-3295: "#        oldPRsDir='OldPrs'
 		#        if not os.path.exists(oldPRsDir):
 		#                os.mkdir(oldPRsDir)
 		#                
@@ -444,14 +444,14 @@ Lines 3141-3151: "#        oldPRsDir='OldPrs'
 		#        print("Result:"+result)
 		"
 		
-Line 3201: "#unicodestring = '\xa0'"
+Line 3356: "#unicodestring = '\xa0'"
 
-Line 3295: "# processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=False,  testfiles=None,"
+Line 3450: "# processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=False,  testfiles=None,"
 
-Lines 3384-3385: "#smoketestHome = os.getcwd()
+Lines 3539-3540: "#smoketestHome = os.getcwd()
         	  #knownPullRequests = glob.glob("smoketest-*") + glob.glob("PR-*")"
         	  
-Lines 3391-3397: "#        CatchUpMaster()
+Lines 3547-3553: "#        CatchUpMaster()
 		  #        print("[%s] - Check and remove all finished tasks from the list." % (threading.current_thread().name,  len(threads)))
 		  #        for key in threads:
 		  #            if not threads[key]['thread'].is_alive():
@@ -459,5 +459,5 @@ Lines 3391-3397: "#        CatchUpMaster()
 		  #                del threads[key]
 		  #        "
 		  
-Line 3482: "#print("---------------------------------------------")"
+Line 3644: "#print("---------------------------------------------")"
 
