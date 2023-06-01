@@ -7,58 +7,57 @@ Line 150: "#testInfo = {}"
 Lines 201-202:" #print "ch10:'"+str(ch10)+"', ch11:'"+str(ch11)+"'"
         	#print "ch20:'"+str(ch20)+"', ch21:'"+str(ch21)+"'""
         	
-Line 205:"#print(val)"
+Line 206:"#print(val)"
 
-Line 214:"#print '\n\n'"
+Line 215:"#print '\n\n'"
 
-Line 286:"#testName = items[0]+'.'+items[2].strip()"
+Line 287:"#testName = items[0]+'.'+items[2].strip()"
 
-Lines 303-304:" #items = testname.split('.')
+Lines 304-305:" #items = testname.split('.')
             	#line = "%-*s " % (20,  items[1])"
                 
-Lines 408-409:"# This is a 'Test:' line
+Lines 410-411:"# This is a 'Test:' line
                #testName = items[0]+'.'+items[2].strip()"
                
-Line 422: "#logs[prefix][testName][target]"
+Line 425: "#logs[prefix][testName][target]"
 
-Line 442: "#inError=False"
+Line 445: "#inError=False"
 
-Line 481: "#for testname in sorted(logs[prefix],  key=str.lower) :"
+Line 484: "#for testname in sorted(logs[prefix],  key=str.lower) :"
 
-Line 485: "#print("%3d:%s-%s-%s" % (executed,  prefix,  target, testname))"
+Line 488: "#print("%3d:%s-%s-%s" % (executed,  prefix,  target, testname))"
 
-Line 513: "#print("total:%3d, pass: %3d, fails:%3d\n-----------------------\n" % (executed,  passed,  failed))"
+Line 516: "#print("total:%3d, pass: %3d, fails:%3d\n-----------------------\n" % (executed,  passed,  failed))"
 
-Lines 563-564: "#items = testname.split('.')
+Lines 566-567: "#items = testname.split('.')
                 #line = "%-*s " % (20,  items[1])"
                 
-Line 615-616: "#print("\t%s" % (str(m.groups())))
+Line 619-620: "#print("\t%s" % (str(m.groups())))
 	       #retVal[m.group(2)] = m.group(1)"
 	       
-Lines 658-659, 668-669: "# Using wget (problems on Replacement MFA machines)
+Lines 663-664, 675-676: "# Using wget (problems on Replacement MFA machines)
 		#myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests.json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)"
 		
-Lines 678-680: "# With curl
+Lines 687-688: "# With curl
 		#myProc = subprocess.Popen(["curl -S " + headers + " -i -o pullRequests.json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
 		#(result,  retCode) = formatResult(myProc)"
 		
-Lines 690-693: "#myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests"+str(page)+".json https://api.github.com/repositories/2030681/pulls?page="+str(page)],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+Lines 702-704: "#myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests"+str(page)+".json https://api.github.com/repositories/2030681/pulls?page="+str(page)],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
                 # Using wget (problems on Replacement MFA machines)
-                #myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests"+str(page)+".json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls?page="+str(page)], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                # Using curl"
+                #myProc = subprocess.Popen(["wget -S " + headers + " -OpullRequests"+str(page)+".json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls?page="+str(page)], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)"
                 
-Lines 694-695: "# With curl
+Lines 709-710: "# With curl
                 #myProc = subprocess.Popen(["curl -S " + headers + " -opullRequests"+str(page)+".json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls?page="+str(page)], shell=True, bufsize=8192, stdout=subprocess.PIPE, stderr=subprocess.PIPE)"
                 
-Line 718: "#print("Result: " + str(result))"
+Line 736: "#print("Result: " + str(result))"
 
-Line 727: "#print(pulls)"
+Line 745: "#print(pulls)"
 
-Line 766, 770: "#prs[prid]['cmd'] = 'git fetch -ff upstream pull/'+str(prid)+'/head:'+repr(pr['head']['ref'])+'-smoketest'"
+Line 784, 788: "#prs[prid]['cmd'] = 'git fetch -ff upstream pull/'+str(prid)+'/head:'+repr(pr['head']['ref'])+'-smoketest'"
 
-Line 860:"#buildSuccess= False"
+Line 880:"#buildSuccess= False"
 
-Lines 864-871: "# The result of this code block never used, remove 
+Lines 884-891: "# The result of this code block never used, remove 
 		#            buildSummaryFile = open(buildSummaryFileName, 'r')
 		#            buildSummary = buildSummaryFile.readlines()
 		#            buildSummaryFile.close()
@@ -67,16 +66,16 @@ Lines 864-871: "# The result of this code block never used, remove
 		#                    buildSuccess = True
 		#                    break"
 		
-Lines 875-876:"# wget -O<PRID>.diff https://github.com/hpcc-systems/HPCC-Platform/pull/<PRID>.diff
+Lines 902-903:"# wget -O<PRID>.diff https://github.com/hpcc-systems/HPCC-Platform/pull/<PRID>.diff
                #myProc = subprocess.Popen(["wget --timeout=60 -O"+testDir+"/"+str(prid)+".diff https://github.com/hpcc-systems/HPCC-Platform/pull/"+str(prid)+".diff"],  shell=True,  bufsize=65536,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)"
                
-Line 903: "#excludePaths = ['helm/', 'dockerfiles/', '.github/', 'testing/helm/', 'MyDockerfile/']"
+Line 931: "#excludePaths = ['helm/', 'dockerfiles/', '.github/', 'testing/helm/', 'MyDockerfile/']"
 
-Line 906: "#prs[prid]['excludeFromTest'] = any([True for x in prs[prid]['files'] if any( [True for y in excludePaths if x.startswith(y) ])] )"
+Line 934: "#prs[prid]['excludeFromTest'] = any([True for x in prs[prid]['files'] if any( [True for y in excludePaths if x.startswith(y) ])] )"
 
-Line 951: "#print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+' sheduled to testing ('+prs[prid]['reason']+')')"
+Line 979: "#print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+' sheduled to testing ('+prs[prid]['reason']+')')"
 
-Lines 953-971: "#            # generates changed file list:
+Lines 981-1005: "#            # generates changed file list:
 #            # wget -O<PRID>.diff https://github.com/hpcc-systems/HPCC-Platform/pull/<PRID>.diff
 #            #myProc = subprocess.Popen(["wget --timeout=60 -O"+testDir+"/"+str(prid)+".diff https://github.com/hpcc-systems/HPCC-Platform/pull/"+str(prid)+".diff"],  shell=True,  bufsize=65536,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
 #            # With curl
@@ -106,102 +105,102 @@ Lines 953-971: "#            # generates changed file list:
 Lines 982-983: "#elif changedFile.startswith('helm') or changedFile.startswith('Dockefiles'):
 		#prs[prid]['excludeFromTest'] = True"
 		
-Lines 1074-1078: "#if prs[prid]['isDocsChanged']: # and not os.path.exists(buildSummaryFileName):
+Lines 1129-1133: "#if prs[prid]['isDocsChanged']: # and not os.path.exists(buildSummaryFileName):
                 # buildSummaryFile = open(buildSummaryFileName,  "wb")
                 # buildSummaryFile.write( "Only documentation changed! Don't build." )
                 # buildSummaryFile.close()
                 # print("In PR-"+str(prid)+", label: "+prs[prid]['label']+" only documentation changed! Don't sheduled to testing ")"
                 
-Line 1081: "#print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+" scheduled to testing (reason:'"+prs[prid]['reason']+"', is DOCS changed:"+str(prs[prid]['isDocsChanged'])+")")"
+Line 1141: "#print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+" scheduled to testing (reason:'"+prs[prid]['reason']+"', is DOCS changed:"+str(prs[prid]['isDocsChanged'])+")")"
 
-Line 1168: "#return (prs, buildPr)"
+Line 1228: "#return (prs, buildPr)"
 
-Lines 1341-1344: "  # Smoketest has no right to push
+Lines 1390-1393: "  # Smoketest has no right to push
 		    # print("\tgit push origin master")
 		    # myProc = subprocess.Popen(["git push origin master"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
 		    # result = formatResult(myProc)"
 		    
-Lines 1355-1358: "#myProc = subprocess.Popen(["ecl --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+Lines 1409-1412: "#myProc = subprocess.Popen(["ecl --version"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
 		  #        result = myProc.stdout.read() + myProc.stderr.read()
 		  #        #results = result.split('\n')
 		  #        print("\t"+result)"
 		
-Lines 1359-1361: "#    err = Error("6002")
+Lines 1416-1418: "#    err = Error("6002")
 		  #    logging.error("%s. checkHpccStatus error:%s!" % (1,  err))
 		  #    raise Error(err)
 		  
-Lines 1363-1365: "    #    err = Error("6003")
+Lines 1423-1425: "    #    err = Error("6003")
 		    #    logging.error("%s. checkHpccStatus error:%s!" % (1,  err))
 		    #    raise Error(err)"
 		    
-Line 1377: "#tableItems=[]"
+Line 1439: "#tableItems=[]"
 
-Line 1423: "#values ="|"
+Line 1485: "#values ="|"
 
-Line 1513: "#result = result.replace('\n', '\\n')+"\\n"
+Line 1575: "#result = result.replace('\n', '\\n')+"\\n"
 
-Lines 1643-1643: "#msg +=  '\n' + buildErrorStr + '\n'
+Lines 1704-1705: "#msg +=  '\n' + buildErrorStr + '\n'
                   #buildFailed=False"
                   
-Line 1646: "#eclWatchBuild = False"
+Line 1709: "#eclWatchBuild = False"
 
-Line 1822: "#print("\tSuite Error"+result)"
+Line 1885: "#print("\tSuite Error"+result)"
 
-Line 1868: "#msg += result.replace('stopped',  'stopped,').replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace("\\", "").replace('\<','<').replace('/>','>').replace('\xc2\xae','').replace('/*', '*').replace('*/', '*')"
+Line 1931: "#msg += result.replace('stopped',  'stopped,').replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace("\\", "").replace('\<','<').replace('/>','>').replace('\xc2\xae','').replace('/*', '*').replace('*/', '*')"
 
-Line 1873: "#print(", "+result)"
+Line 1936: "#print(", "+result)"
 
-Line 1888: "#eclWatchBuildError += result + '\n'"
+Line 1951: "#eclWatchBuildError += result + '\n'"
 
-Line 1912: "#eclWatchBuild=True"
+Line 1976: "#eclWatchBuild=True"
 
-Lines 1917-1921: "#msg += eclWatchTable.getTable()
+Lines 1981-1985: "#msg += eclWatchTable.getTable()
 		  #msg += '\n'
 		  #if len(npmTestResultErr) > 0:
 		  #print(npmTestResultErr)
 		  #msg += npmTestResultErr + '\n'"
 	
-Lines 1925-1927: "#items = result.split()
+Lines 1993-1995: "#items = result.split()
 		  #eclWatchTable.addItem("lint " + items[1]+':'+items[0])
 		  ##npmTestResult += 'Error(s): \n'"
 		  
-Lines 1962-1965: "# That was a vertical table, I think it is too big.
+Lines 2032-2035: "# That was a vertical table, I think it is too big.
 		  #timeStatsTable.addItem('Stage:' + items[0].replace(' time', '').strip() )
 		  #timeStatsTable.addItem('Time: ' + items[1], ': ')
 		  # Create a horizontal table "
 		  
-Lines 1966-1968: "#if len(msg) > maxMsgLen:
+Lines 2039-2041: "#if len(msg) > maxMsgLen:
 		  ## Too much messsages something really wrong
 		  #break"
 		  
-Line 2000: "#.replace('\\xc2\\xae', '\xc2\xae')" 
+Line 2076: "#.replace('\\xc2\\xae', '\xc2\xae')" 
 **Note**: This is commented out of the end of "msg = msg.replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\n', '\\n').replace('"', '\'')"	
 
-Line 2025, 2532: "#curDir =  os.getcwd()"
+Line 2101, 2641: "#curDir =  os.getcwd()"
 
-Line 2072: "#testDir = "smoketest-"+str(prid)"
+Line 2148: "#testDir = "smoketest-"+str(prid)"
 
-Lines 2111-2115: "#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
+Lines 2187-2191: "#            resultFile.write("\tAdd comment to pull request\n\tComment Cmd:\n")
 		  #            resultFile.write("------------------------------------------------------\n")
 		  #            resultFile.write(addCommentCmd+"\n")
 		  #            resultFile.write("------------------------------------------------------\n")
 		  #            if addGitComment:"
 		  
-Line 2132, 2252, 2352, 2400, 2405: "#resultFile.write("\tresult:"+result+"\n")"
+Line 2212, 2231, 2296, 2497, 2503: "#resultFile.write("\tresult:"+result+"\n")"
 
-Line 2235: "#result = formatResult(myProc, resultFile,  noEcho)"
+Line 2315: "#result = formatResult(myProc, resultFile,  noEcho)"
 
-Lines 2264-2265: "#resultFile.write("\tscl enable devtoolset-2 "+os.getcwd()+"/build.sh " + prs[prid]['regSuiteTests'] + "\n")
+Lines 2345-2346: "#resultFile.write("\tscl enable devtoolset-2 "+os.getcwd()+"/build.sh " + prs[prid]['regSuiteTests'] + "\n")
                     #myProc = subprocess.Popen(["scl enable devtoolset-2 "+os.getcwd()+"/build.sh " + prs[prid]['regSuiteTests'] ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)"
                     
-Line 2279: "#myProc = subprocess.Popen(["./build.sh " + prs[prid]['regSuiteTests']  ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+Line 2361: "#myProc = subprocess.Popen(["./build.sh " + prs[prid]['regSuiteTests']  ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 
-Lines 2284-2295: "#myStdout = myProc.stdout.read()
+Lines 2366-2367: "#myStdout = myProc.stdout.read()
                	  #myStderr = myProc.stderr.read()"
                	  
-Line 2304: "#print("\t"+result)"
+Line 2387: "#print("\t"+result)"
 
-Lines 2316-2318: "# Avoid orphan escape '\' char.
+Lines 2399-2401: "# Avoid orphan escape '\' char.
             	  #while ( msg[maxMsgLen-1] == '\\' ):
             	  #    maxMsgLen -= 1"
             	  
