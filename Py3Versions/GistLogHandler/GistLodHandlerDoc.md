@@ -58,3 +58,29 @@ print(("Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.s
 ```
 Suggestion: This change is not necessary.
 
+##Post 2to3 Changes
+
+**Change on line 21**
+
+Original:
+```
+self.resultFile = open(resultFileName,  "w", 0)
+```
+Error Message: "self.resultFile = open(resultFileName,  "w", 0)
+ValueError: can't have unbuffered text I/O"
+
+Suggestion: 
+```
+self.resultFile = open(resultFileName,  "w")
+```
+
+**Change on line 120**
+
+Original:
+```
+for line in result[0].split('\n'):
+```
+Error Message: "IndexError: string index out of range"
+
+Suggestion: Adding ```.decode('utf-8')``` on lines 43 & 46 fixed this issue 
+

@@ -18,3 +18,6 @@ Line 362-368: " # save id
 		#            gistsIdFileName= line.strip().replace('\n','') + '.dat'
 		#        else:"
 		
+Lines 388-389: "#(id,  link) = newGistsIds[index].replace('\n','').split(',')
+                #file.write(id + ', ' + link + '\n')"
+		
