@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-#import os
 import sys
 import subprocess
 import time
@@ -184,7 +183,7 @@ maxLoop = maxSelfRuntimeInSec/delayInSec
 verbose = options.verbose
 
 myPrint("App name:" + sys.argv[0])
-#selfName = os.path.basename(sys.argv[0])
+
 selfName = sys.argv[0][2:]
 myPrint("selfName: " + selfName)
 myPrint("Process: " + str(process))
@@ -195,14 +194,10 @@ myPrint("Verbose is :" +str(verbose))
 
 pass
 
-
 items = {}
 items[process]={}
-#psCmd = "sudo ps aux | grep '["+process[0]+"]"+process[2:]+"'"
-#psCmd += " | awk '{print $2 \",\" $12}' "
 
 psCmd = "ps ax | grep '["+process[0]+"]"+process[1:]+"'"
-#psCmd += " | awk '{print $1 \",\" $5}' "
 
 myPrintV("psCmd: " + psCmd)
 
