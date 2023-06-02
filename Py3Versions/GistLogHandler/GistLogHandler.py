@@ -406,7 +406,9 @@ class GistLogHandler(object):
 
 if __name__ == '__main__':
     
-    gistHandler = GistLogHandler()
+    token = open("Token.dat", "r")
+    
+    gistHandler = GistLogHandler(token.readline().strip())
     gistHandler.removeGists(True)
     gistHandler.createGist(999, 'cafebabe')
     gistHandler.cloneGist()

@@ -18,7 +18,7 @@ class GistLogHandler(object):
         if self.resultFile == None:
             curTime = time.strftime("%y-%m-%d-%H-%M-%S")
             resultFileName= "gistloghandler-" + curTime + ".log"
-            self.resultFile = open(resultFileName,  "w", 0)
+            self.resultFile = open(resultFileName,  "w")
         self.distDir = 'gists'
         self.curDir =  os.getcwd()
         self.verbose = verbose
@@ -40,10 +40,10 @@ class GistLogHandler(object):
     
     def formatResult(self, proc):
         retcode = proc.wait()
-        stdout = proc.stdout.read().rstrip('\n').replace('\n','\n\t\t')
+        stdout = proc.stdout.read().decode('utf-8').rstrip('\n').replace('\n','\n\t\t')
         if len(stdout) == 0:
             stdout = 'None'
-        stderr = proc.stderr.read().rstrip('\n').replace('\n','\n\t\t')
+        stderr = proc.stderr.read().decode('utf-8') .rstrip('\n').replace('\n','\n\t\t')
         if len(stderr) == 0:
             stderr = 'None'
         result = "returncode: " + str(retcode) + "\n\t\tstdout: " + stdout + "\n\t\tstderr: " + stderr
@@ -385,8 +385,6 @@ class GistLogHandler(object):
                     # Re-write gists ID file with the last one
                     file = open(self.gistsIdFileName, "w")
                     for index in range(len(newGistsIds)):
-                        #(id,  link) = newGistsIds[index].replace('\n','').split(',')
-                        #file.write(id + ', ' + link + '\n')
                         file.write(newGistsIds[index])
                     file.close()
                 else:
@@ -408,7 +406,9 @@ class GistLogHandler(object):
 
 if __name__ == '__main__':
     
-    gistHandler = GistLogHandler()
+    token = open("Token.dat", "r")
+    
+    gistHandler = GistLogHandler(token.readline().strip())
     gistHandler.removeGists(True)
     gistHandler.createGist(999, 'cafebabe')
     gistHandler.cloneGist()
