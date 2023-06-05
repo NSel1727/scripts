@@ -33,7 +33,7 @@ updateInterval = 30 # sec
 def update():
     startTimestamp = time.time()
     nextUpdateTime = datetime.now() + timedelta(seconds = updateInterval)
-    print(("Update (%s)..." % (time.strftime("%Y-%m-%d %H:%M:%S")))) 
+    print("Update (%s)..." % (time.strftime("%Y-%m-%d %H:%M:%S"))) 
     divUpdate.text = "Update..."
     divCurrentState.text = 'Idle'
 
@@ -53,7 +53,7 @@ def update():
            lastMsgIndex -= 1
 
         lastMsg = result[lastMsgIndex]
-        print(("\tlastMsg: %s \n\tindex of lastMsg: %d" % (lastMsg,  lastMsgIndex)))
+        print("\tlastMsg: %s \n\tindex of lastMsg: %d" % (lastMsg,  lastMsgIndex))
 
         if lastMsg.startswith('Wait') or lastMsg.startswith('start'): 
             divCurrentState.text = 'Idle'
@@ -173,7 +173,7 @@ def update():
                         else:
                             remainTime = (now.hour * 3600 + now.minute * 60 + now.second) - (ectTime.hour * 3600 + ectTime.minute * 60 + ectTime.second) 
                             isOver = 'overrun'
-                            print(("%s is overrun with %s seconds" % (pr, remainTime)))
+                            print ("%s is overrun with %s seconds" % (pr, remainTime))
 
                         remainTimeStr = "%s%2dh %2dm %s" % (isInTime, remainTime / 3600, (remainTime % 3600) / 60,  isOver)
                         ect = "~ %s (%s)" % (ectTime.strftime("%H:%M"), remainTimeStr )
@@ -189,7 +189,7 @@ def update():
         divCurrentPhase.text = phase + subPhase
 
     else:
-        print(("\tlen result: %d" % (len(result))))
+        print("\tlen result: %d" % (len(result)))
         if len(result) == 0:
             result.append("")
         
@@ -206,7 +206,7 @@ def update():
     #sel = Selection( indices = [len(result)-1])
     #source.selected = sel
         
-    print((" Done (%2d sec)." % (time.time()-startTimestamp)))
+    print(" Done (%2d sec)." % (time.time()-startTimestamp))
     
     divUpdate.text = "Updated. (Next: %s)" % (nextUpdateTime.time().strftime("%H:%M:%S"))
 
