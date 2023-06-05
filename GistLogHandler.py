@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import os
 import subprocess
 import sys
@@ -406,7 +408,7 @@ class GistLogHandler(object):
 
 if __name__ == '__main__':
     
-    token = open("Token.dat", "r")
+    token = open("token.dat", "r")
     
     gistHandler = GistLogHandler(token.readline().strip())
     gistHandler.removeGists(True)
