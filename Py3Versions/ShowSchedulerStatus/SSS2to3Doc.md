@@ -84,3 +84,16 @@ Suggestion: This change is not necessary.
 
 ##Post 2-3 Changes:
 
+**Issue on line 43**
+
+Original:
+```
+result = result.split('\n')
+```
+Error Message: "a bytes-like object is required, not 'str'"
+
+Suggested Fix:
+```
+result = result.decode('utf-8').split('\n')
+```
+
