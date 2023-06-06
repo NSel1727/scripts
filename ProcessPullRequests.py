@@ -284,7 +284,7 @@ def CollectResultsOld(logPath, tests):
                     logFileName = sortedFiles[0] 
                     print(logFileName)
                     
-                    logFile = open(logFileName,  'rb')
+                    logFile = open(logFileName,  'rb').decode('utf-8')
                     oldIndex = 1
                     for line in logFile:
                         line = line.strip().replace('\n', '')
@@ -681,7 +681,7 @@ def GetOpenPulls(knownPullRequests):
 
         result = myProc.stdout.read().decode('utf-8') + myProc.stderr.read().decode('utf-8')
         
-        pulls_data = open('pullRequests.json').read().decode('utf-8')
+        pulls_data = open('pullRequests.json').read()
         if '"draft":' not in pulls_data:
             print("Use an experimental GitHub api to determine draft pull requests")
             headers   =" '--header=User-Agent: Mozilla/5.0 (Windows NT 6.0) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11'"
@@ -714,12 +714,12 @@ def GetOpenPulls(knownPullRequests):
                 myProc = subprocess.Popen(["curl " + headers + " -opullRequests"+str(page)+".json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls?page="+str(page)],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
                 result = myProc.stdout.read().decode('utf-8') + myProc.stderr.read().decode('utf-8')
 
-                pulls_data2 = open('pullRequests' + str(page) + '.json').read().decode('utf-8')
+                pulls_data2 = open('pullRequests' + str(page) + '.json').read()
                 pulls_data2 = ',\n'+pulls_data2.lstrip('[').rstrip(']\n')
                 morePages.append(pulls_data2)
             pass
             
-        pulls_data = open('pullRequests.json').read().decode('utf-8')
+        pulls_data = open('pullRequests.json').read()
         if len(morePages) > 0:
             pulls_data = pulls_data.rstrip(']\n')
             for page in morePages:
@@ -777,7 +777,7 @@ def GetOpenPulls(knownPullRequests):
             continue
             pass
             
-        prs[prid] = {'user':pr['user']['login'], 'code_base':pr['base']['ref'],  'label':pr['head']['ref'].encode('ascii','replace'),
+        prs[prid] = {'user':pr['user']['login'], 'code_base':pr['base']['ref'],  'label':pr['head']['ref'],
                             'sha':pr['head']['sha'], 'title':pr['title'], 'draft':False }
         
         prs[prid] ['prBranchId'] = prs[prid]['label'] + '-smoketest'
@@ -854,7 +854,7 @@ def GetOpenPulls(knownPullRequests):
         shaFileName = os.path.join(testDir, 'sha.dat')
         if not os.path.exists(shaFileName):
             # Create sha.dat file
-            outFile = open(shaFileName,  "wb")
+            outFile = open(shaFileName,  "w")
             outFile.write(pr['head']['sha'])
             outFile.close()
             
@@ -868,7 +868,7 @@ def GetOpenPulls(knownPullRequests):
         newBaseBranch = pr['base']['ref']
         if not os.path.exists(baseBranchFileName):
             # Create sha.dat file
-            baseBranchFile = open(baseBranchFileName,  "wb")
+            baseBranchFile = open(baseBranchFileName,  "w")
             baseBranchFile.write(newBaseBranch)
             baseBranchFile.close()
             baseBranch = pr['base']['ref']
@@ -900,10 +900,10 @@ def GetOpenPulls(knownPullRequests):
                     os.unlink(oldShaFileName)
                 os.rename(shaFileName,  oldShaFileName)
                 # Update sha.dat file
-                outFile = open(shaFileName,  "wb")
+                outFile = open(shaFileName,  "w")
                 outFile.write(pr['head']['sha'])
                 outFile.close()
-                prs[prid]['reason']="New commit"
+                prs[prid]['reason']="fNew commit"
             elif baseBranch != newBaseBranch:
                 updatedPRs +=1
                 # rename old baseBranch file from baseBranch.dat to baseBranch.old
@@ -912,7 +912,7 @@ def GetOpenPulls(knownPullRequests):
                     os.unlink(oldBaseBranchFileName)
                 os.rename(baseBranchFileName,  oldBaseBranchFileName)
                 # Update baseBranch.dat file
-                outFile = open(baseBranchFileName,  "wb")
+                outFile = open(baseBranchFileName,  "w")
                 outFile.write(newBaseBranch)
                 outFile.close()
                 prs[prid]['reason']="Base branch changed"
@@ -927,8 +927,8 @@ def GetOpenPulls(knownPullRequests):
             myProc = subprocess.Popen(["curl -L --connect-timeout 60 -o"+testDir+"/"+str(prid)+".diff https://github.com/hpcc-systems/HPCC-Platform/pull/"+str(prid)+".diff"],  shell=True,  bufsize=65536,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
             # The myProc.stdout.read() hanged if there was a large (> 40MB) diff file to get.
             (result,  err) = myProc.communicate()
-            result = result.rstrip('\n').split('\n')
-            err = err.rstrip('\n').split('\n')
+            result = result.decode('utf-8').rstrip('\n').split('\n')
+            err = err.decode('utf-8').rstrip('\n').split('\n')
             
             # cat <PRID>.diff | grep '[d]iff' | awk '{ print $3 }' | sed 's/a\///'
             # gives the changes source files with path
@@ -965,7 +965,7 @@ def GetOpenPulls(knownPullRequests):
             #prs[prid]['containerized'] = False
                 
             eclWatchOnly=True
-            changedFilesFile = open(changedFilesFileName,  "wb")
+            changedFilesFile = open(changedFilesFileName,  "w")
             for changedFile in  prs[prid]['files']:
                 if changedFile.startswith('testing/regress/ecl/'):
                     # If a changed file is in the setup directory it shouldn't execute separately
@@ -1094,13 +1094,9 @@ def GetOpenPulls(knownPullRequests):
             if isBuilt:
                 os.unlink(buildSummaryFileName)
                 
-
-
-
             prs[prid]['inQueue'] = True
             buildPr += 1
-            
-            
+                
             print("Build PR-%s, label: %s scheduled to testing (reason:'%s', is DOCS changed: %s, is ECLWatch build: %s, is Containerized: %s)" % (str(prid), prs[prid]['label'], prs[prid]['reason'], str(prs[prid]['isDocsChanged']), str(prs[prid]['buildEclWatch']),  str(prs[prid]['containerized']) ))
             pass
             
@@ -1111,7 +1107,7 @@ def GetOpenPulls(knownPullRequests):
                 testedPRs += 1
             else:
                 print("Build PR-"+str(prid)+", label: "+prs[prid]['label']+' is in draft state, skip it!')
-                buildSummaryFile = open(buildSummaryFileName,  "wb")
+                buildSummaryFile = open(buildSummaryFileName,  "w")
                 buildSummaryFile.write( prs[prid]['label'] + " is in draft state, skipped." )
                 buildSummaryFile.close()
                 skippedPRs += 1
@@ -2071,7 +2067,7 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
             newCommitId = GetPullReqCommitId(str(prid))
             if newCommitId != '':
                 prs[prid]['sha'] = newCommitId
-                outFile = open('sha.dat',  "wb")
+                outFile = open('sha.dat',  "w")
                 outFile.write( prs[prid]['sha'])
                 outFile.close()# store commit crc
                     
@@ -2198,7 +2194,7 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
                 # generate build.summary file
                 os.chdir("../")
                 buildSummaryFileName = 'build.summary'
-                buildSummaryFile = open(buildSummaryFileName,  "wb")
+                buildSummaryFile = open(buildSummaryFileName,  "w")
                 buildSummaryFile.write(noBuildReason+'\n')
                 buildSummaryFile.write(result)
                 buildSummaryFile.close()
