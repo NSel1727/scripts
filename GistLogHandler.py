@@ -408,7 +408,7 @@ class GistLogHandler(object):
 
 if __name__ == '__main__':
     
-	if os.path.isfile("token.dat"):
+	try:
 		token = open("token.dat", "r")
     	
 		gistHandler = GistLogHandler(token.readline().strip())
@@ -418,6 +418,6 @@ if __name__ == '__main__':
 		gistHandler.updateReadme('OS: blabla\n')
 		gistHandler.updateReadme('More blabla \\n ' + time.strftime("%y-%m-%d-%H-%M-%S") + ' \\n ')
 		gistHandler.commitAndPush()
-	else:
-   		print("Error: token.dat is not found in your directory.")
+	except Exception as e:
+		print(str(e))
 
