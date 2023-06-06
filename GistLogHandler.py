@@ -408,13 +408,16 @@ class GistLogHandler(object):
 
 if __name__ == '__main__':
     
-    token = open("token.dat", "r")
-    
-    gistHandler = GistLogHandler(token.readline().strip())
-    gistHandler.removeGists(True)
-    gistHandler.createGist(999, 'cafebabe')
-    gistHandler.cloneGist()
-    gistHandler.updateReadme('OS: blabla\n')
-    gistHandler.updateReadme('More blabla \\n ' + time.strftime("%y-%m-%d-%H-%M-%S") + ' \\n ')
-    gistHandler.commitAndPush()
+	if os.path.isfile("token.dat"):
+		token = open("token.dat", "r")
+    	
+		gistHandler = GistLogHandler(token.readline().strip())
+		gistHandler.removeGists(True)
+		gistHandler.createGist(999, 'cafebabe')
+		gistHandler.cloneGist()
+		gistHandler.updateReadme('OS: blabla\n')
+		gistHandler.updateReadme('More blabla \\n ' + time.strftime("%y-%m-%d-%H-%M-%S") + ' \\n ')
+		gistHandler.commitAndPush()
+	else:
+   		print("Error: token.dat is not found in your directory.")
 

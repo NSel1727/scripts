@@ -641,7 +641,7 @@ def GetPullReqCommitId(prid):
     if gitHubToken != "":
         try:
             myProc = subprocess.Popen(['curl --max-time %d --request GET -H "Content-Type: application/json" -H "Authorization: token %s" https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls/%s' % (curlTimeout, gitHubToken, prid)],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            result = myProc.stdout.read()
+            result = myProc.stdout.read().decode('utf-8')
             pullInfo = json.loads(result)
             retVal = pullInfo['head']['sha']
         except:
@@ -679,9 +679,9 @@ def GetOpenPulls(knownPullRequests):
         # Using curl
         myProc = subprocess.Popen(["curl " + headers + " -opullRequests.json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
 
-        result = myProc.stdout.read() + myProc.stderr.read()
+        result = myProc.stdout.read().decode('utf-8') + myProc.stderr.read().decode('utf-8')
         
-        pulls_data = open('pullRequests.json').read()
+        pulls_data = open('pullRequests.json').read().decode('utf-8')
         if '"draft":' not in pulls_data:
             print("Use an experimental GitHub api to determine draft pull requests")
             headers   =" '--header=User-Agent: Mozilla/5.0 (Windows NT 6.0) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11'"
@@ -691,11 +691,11 @@ def GetOpenPulls(knownPullRequests):
             # Using curl
             myProc = subprocess.Popen(["curl " + headers + " -opullRequests.json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
  
-            result = myProc.stdout.read() + myProc.stderr.read()
+            result = myProc.stdout.read().decode('utf-8') + myProc.stderr.read().decode('utf-8')
             
         # get headers
         myProc = subprocess.Popen(["curl --head " + headers + " https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-        result = myProc.stdout.read() + myProc.stderr.read()
+        result = myProc.stdout.read().decode('utf-8') + myProc.stderr.read().decode('utf-8')
             
         morePages = []
         if 'Link:' in result:
@@ -712,14 +712,14 @@ def GetOpenPulls(knownPullRequests):
                 
                 # Using curl
                 myProc = subprocess.Popen(["curl " + headers + " -opullRequests"+str(page)+".json https://api.github.com/repos/hpcc-systems/HPCC-Platform/pulls?page="+str(page)],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                result = myProc.stdout.read() + myProc.stderr.read()
+                result = myProc.stdout.read().decode('utf-8') + myProc.stderr.read().decode('utf-8')
 
-                pulls_data2 = open('pullRequests' + str(page) + '.json').read()
+                pulls_data2 = open('pullRequests' + str(page) + '.json').read().decode('utf-8')
                 pulls_data2 = ',\n'+pulls_data2.lstrip('[').rstrip(']\n')
                 morePages.append(pulls_data2)
             pass
             
-        pulls_data = open('pullRequests.json').read()
+        pulls_data = open('pullRequests.json').read().decode('utf-8')
         if len(morePages) > 0:
             pulls_data = pulls_data.rstrip(']\n')
             for page in morePages:
@@ -935,7 +935,7 @@ def GetOpenPulls(knownPullRequests):
             #prs[pr['number']]['files'] = output of command
             
             myProc = subprocess.Popen(["cat "+testDir+"/"+str(prid)+".diff | grep '[d]iff ' | awk '{ print $3 }' | sed 's/a\///'"],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            result = myProc.stdout.read().rstrip('\n').split('\n')
+            result = myProc.stdout.read().decode('utf-8').rstrip('\n').split('\n')
             prs[prid]['files'] = result
             
             changedFilesFileName = os.path.join(testDir, 'changedFiles.txt')
