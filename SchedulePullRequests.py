@@ -1243,6 +1243,9 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
 def formatResult(proc, resultFile = None, echo = True):
     (stdout, stderr) = proc.communicate()
     retcode = proc.wait()
+    
+    stdout = stdout.decode('utf-8')
+	stderr = stderr.decode('utf-8')
  
     if len(stdout) == 0:
         stdout = 'None'
