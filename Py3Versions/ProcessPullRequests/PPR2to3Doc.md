@@ -212,7 +212,7 @@ Original:
 Updated Version:
 ```
         result = formatResult(myProc)
-        print("Result: " + result.result)
+        print("Result: " + result[0])
 ```
 
 **If-else change on line 1975**

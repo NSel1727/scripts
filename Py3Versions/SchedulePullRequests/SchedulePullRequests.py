@@ -808,9 +808,9 @@ def GetOpenPulls(knownPullRequests):
                     # mv archived PR back from OldPrs directory
                     print ("Move closed "+ testDir + " directory from OldPrs/ back to smoketest directory.")
                     myProc = subprocess.Popen(["mv -f " + 'OldPrs/'+ testDir +" ."],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                    (myStdout,  myStderr) = myProc.communicate()
-                    result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr.replace('\n','') + "'."
-                    print("Result: "+result)
+                    result = formatResult(myProc)
+                    print(result)
+                    print("Result: " + result[0])
                     pass
 
         try:
@@ -1194,9 +1194,8 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
             if os.path.exists(pullReqDir+"/HPCC-Platform") or os.path.exists(pullReqDir+"/build") or os.path.exists(pullReqDir+"/HPCCSystems-regression") :
                 print ("Delete HPCC-Platform, build, HPCCSystems-regression/archives and HPCCSystems-regression/results directories of the closed "+pullReqDir)
                 myProc = subprocess.Popen(["sudo rm -rf "+pullReqDir+"/HPCC-Platform "+pullReqDir+"/build "+pullReqDir+"/HPCCSystems-regression/archives "+pullReqDir+"/HPCCSystems-regression/results "],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                (myStdout,  myStderr) = myProc.communicate()
-                result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-                print("Result: "+result)
+                result = formatResult(myProc)
+                print("Result: " + result[0])
             # Remove gists
             os.chdir(pullReqDir)
             try:
@@ -1211,29 +1210,27 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
                     
             print ("Move closed "+ pullReqDir + " directory to OldPrs/ .")
             myProc = subprocess.Popen(["mv -f " + pullReqDir +" OldPrs/"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            (myStdout,  myStderr) = myProc.communicate()
-            result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr.replace('\n','') + "'."
-            print("\tResult: "+result)
+            result = formatResult(myProc)
+            print("Result:", result[0])
             
-            if myProc.returncode != 0 and 'cannot move' in myStderr:
+            #result[3] is stderr
+            if myProc.returncode != 0 and 'cannot move' in result[3]:
                 # Handle the rare situation when PR directory already exists in OldPrs
                 # Copy all files from <pullReqDir> dir to OldPrs/<pullReqDir>
                 print ("\tCopy files from "+ pullReqDir + " closed directory to OldPrs/ .")
                 cmd = "cp -rf " + pullReqDir +"/* OldPrs/" + pullReqDir + "/."
                 print ("\tcmd:" + cmd)
                 myProc = subprocess.Popen([ cmd ],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                (myStdout,  myStderr) = myProc.communicate()
-                result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-                print("\tResult: "+result)
+                result = formatResult(myProc)
+                print("Result: " + result[0])
                 if myProc.returncode == 0:
                     # Remove <pullReqDir>
                     print ("\tRemove "+ pullReqDir + " directory.")
                     cmd = "rm -rf " + pullReqDir
                     print ("\tcmd:" + cmd)
                     myProc = subprocess.Popen([ cmd],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                    (myStdout,  myStderr) = myProc.communicate()
-                    result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-                    print("\tResult: "+result)
+                    result = formatResult(myProc)
+                    print("Result: " + result[0])
                                
     if newlyClosedPrs == 0:
         print("\nNo PR closed from last run.\n")
@@ -1243,6 +1240,9 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
 def formatResult(proc, resultFile = None, echo = True):
     (stdout, stderr) = proc.communicate()
     retcode = proc.wait()
+    
+    stdout = stdout.decode('utf-8')
+    stderr = stderr.decode('utf-8')
  
     if len(stdout) == 0:
         stdout = 'None'
@@ -1264,7 +1264,7 @@ def formatResult(proc, resultFile = None, echo = True):
         except:
             pass
             
-    return (result, retcode)
+    return (result, retcode, stdout, stderr)
     
 def CatchUpMaster():
     print("Catch up master")
@@ -1985,11 +1985,8 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
 
     msg = msg.replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\n', '\\n')
 
-    if type(msg) == type(u' '):
-        msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
-        msg = repr(msg)
-    else:
-        msg = repr(msg)
+    msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
+    msg = repr(msg)
     
     if allPassed:
         msg = msg.replace('Automated Smoketest',  'Automated Smoketest: '+ passEmoji)
@@ -2067,7 +2064,7 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
         curTime = time.strftime("%y-%m-%d-%H-%M-%S")
         testInfo['startTime'] = curTime
         resultFileName= "result-" + curTime + ".log"
-        resultFile = open(resultFileName,  "w", 0)
+        resultFile = open(resultFileName,  "w")
         
         # First or new build
         isBuild=False
@@ -2142,13 +2139,13 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
             resultFile.write("\tPull\n")
             resultFile.write("\t"+prs[prid]['cmd']+"\n")
             myProc = subprocess.Popen(prs[prid]['cmd'],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            (result, retcode) = formatResult(myProc, resultFile)
+            (result, retcode, stdout, stderr) = formatResult(myProc, resultFile)
             if retcode != 0:
                 if 'unknown option' in result:
                     print("\tThere was a problem with prevoius command, try an alternative one")
                     print("\t"+prs[prid]['cmd2'])
                     myProc = subprocess.Popen(prs[prid]['cmd2'],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                    (result, retcode) = formatResult(myProc, resultFile)
+                    (result, retcode, stdout, stderr) = formatResult(myProc, resultFile)
                 
             if (retcode != 0) and ('Merge conflict' not in result):
                 noBuildReason = "Error in git command, should skip build and test."
@@ -2264,6 +2261,8 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
                     myProc = subprocess.Popen([ cmd ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 
                     (myStdout,  myStderr) = myProc.communicate()
+                    myStdout = myStdout.decode('utf-8')
+                    myStderr = myStdout.decode('utf-8')
                 except:
                     print("Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" )
                     pass
@@ -2480,7 +2479,7 @@ def HandleSkippedPulls(prSkipped):
     pass
     
 def consumerTask(prId, pr, cmd, testInfo, resultFileName):
-    resultFile = open(resultFileName,  "a", 0)
+    resultFile = open(resultFileName,  "a")
     cwd = os.getcwd()
     print("cmd:'%s', cwd: %s" % (cmd,  cwd))
     testInfo['codeBase'] =  prs[prId]['code_base']
@@ -2492,7 +2491,7 @@ def consumerTask(prId, pr, cmd, testInfo, resultFileName):
     retcode='0'
     try:
         myProc = subprocess.Popen([ cmd ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-        (result,  retcode) = formatResult(myProc, resultFile, False)
+        (result, retcode, stdout, stderr) = formatResult(myProc, resultFile, False)
     except:
         msg = "Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" 
         print(msg)
@@ -2882,7 +2881,7 @@ class MessageId(object):
                 self.resultFile.write("\tcmd:"+cmd + "\n")
                 
             myProc = subprocess.Popen(cmd,  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            (result, retcode) = formatResult(myProc)
+            (result, retcode, stdout, stderr) = formatResult(myProc)
             if self.resultFile != None:
                 self.resultFile.write("\tresult"+result + "\n")
         
@@ -2906,7 +2905,7 @@ def uploadGitHubComment(addCommentCmd,  resultFile = None):
         attempts -= 1
         myProc = subprocess.Popen(addCommentCmd,  shell=True,  bufsize=8192,  stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
 
-        (result, retcode) = formatResult(myProc)
+        (result, retcode, stdout, stderr) = formatResult(myProc)
         resultFileWrite("\tresult:"+result+"\n")
 
         if 'created_at' in result:
@@ -2987,22 +2986,19 @@ def cleanUp(smoketestHome):
 
         print("\nMove old logs (>6 days) onto " + oldLogsDir +" directory.")
         myProc = subprocess.Popen(["find . -maxdepth 1 -type f -mtime +6 -name 'prp-*' -print -exec mv '{}' " + oldLogsDir +"/. \;"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-        (myStdout,  myStderr) = myProc.communicate()
-        result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-        print("Result:"+result)
+        result = formatResult(myProc)
+        print("Result: " + result[0])
 
         myProc = subprocess.Popen(["find . -maxdepth 1 -type f -mtime +6 -name 'bokeh-*' -print -exec mv '{}' " + oldLogsDir +"/. \;"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-        (myStdout,  myStderr) = myProc.communicate()
-        result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-        print("Result:"+result)
+        result = formatResult(myProc)
+        print("Result: " + result[0])
 
         
         if removeMasterAtExit:
             print("\nRemove HPCC-Platform (master) to force clone it at the next start.")
             myProc = subprocess.Popen(["sudo rm -rf HPCC-Platform"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            (myStdout,  myStderr) = myProc.communicate()
-            result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-            print("Result:"+result)
+            result = formatResult(myProc)
+            print("Result: " + result[0])
             
     except:
         print("Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" )
