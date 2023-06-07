@@ -833,9 +833,8 @@ def GetOpenPulls(knownPullRequests):
                     # mv archived PR back from OldPrs directory
                     print ("Move closed "+ testDir + " directory from OldPrs/ back to smoketest directory.")
                     myProc = subprocess.Popen(["mv -f " + 'OldPrs/'+ testDir +" ."],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                    (myStdout,  myStderr) = myProc.communicate()
-                    result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr.replace('\n','') + "'."
-                    print("Result: "+result)
+                    result = formatResult(myProc)
+                    print("Result: " + result.result)
                     pass
 
 
@@ -903,7 +902,7 @@ def GetOpenPulls(knownPullRequests):
                 outFile = open(shaFileName,  "w")
                 outFile.write(pr['head']['sha'])
                 outFile.close()
-                prs[prid]['reason']="fNew commit"
+                prs[prid]['reason']="New commit"
             elif baseBranch != newBaseBranch:
                 updatedPRs +=1
                 # rename old baseBranch file from baseBranch.dat to baseBranch.old
@@ -1146,9 +1145,9 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
             if os.path.exists(pullReqDir+"/HPCC-Platform") or os.path.exists(pullReqDir+"/build") or os.path.exists(pullReqDir+"/HPCCSystems-regression") :
                 print ("Delete HPCC-Platform, build, HPCCSystems-regression/archives and HPCCSystems-regression/results directories of the closed "+pullReqDir)
                 myProc = subprocess.Popen(["sudo rm -rf "+pullReqDir+"/HPCC-Platform "+pullReqDir+"/build "+pullReqDir+"/HPCCSystems-regression/archives "+pullReqDir+"/HPCCSystems-regression/results "],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                (myStdout,  myStderr) = myProc.communicate()
-                result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-                print("Result: "+result)
+                result = formatResult(myProc)
+                print("Result: " + result.result)
+
             # Remove gists
             os.chdir(pullReqDir)
             try:
@@ -1163,9 +1162,9 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
                     
             print ("Move "+ pullReqDir + " closed directory to OldPrs/ .")
             myProc = subprocess.Popen(["mv -f " + pullReqDir +" OldPrs/"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            (myStdout,  myStderr) = myProc.communicate()
-            result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr.replace('\n','') + "'."
-            print("Result: "+result)
+            
+            result = formatResult(myProc)
+            print("Result: " + result.result)
             
             if myProc.returncode != 0 and 'cannot move' in myStderr:
                 # Handle the rare situation when PR directory already exists in OldPrs
@@ -1174,18 +1173,18 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
                 cmd = "cp -rf " + pullReqDir +"/* OldPrs/" + pullReqDir + "/."
                 print ("\tcmd:" + cmd)
                 myProc = subprocess.Popen([ cmd ],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                (myStdout,  myStderr) = myProc.communicate()
-                result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-                print("\tResult: "+result)
+                
+                result = formatResult(myProc)
+                print("Result: " + result.result)
+                
                 if myProc.returncode == 0:
                     # Remove <pullReqDir>
                     print ("\tRemove "+ pullReqDir + " directory.")
                     cmd = "rm -rf " + pullReqDir
                     print ("\tcmd:" + cmd)
                     myProc = subprocess.Popen([ cmd],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-                    (myStdout,  myStderr) = myProc.communicate()
-                    result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-                    print("\tResult: "+result)
+                    result = formatResult(myProc)
+                    print("Result: " + result.result)
                                
     if newlyClosedPrs == 0:
         print("No PR closed from last run.")
@@ -1193,30 +1192,35 @@ def CleanUpClosedPulls(knownPullRequests, smoketestHome):
         print(str(newlyClosedPrs) +" PR(s) are closed and moved to OldPrs directory")
 
 def formatResult(proc, resultFile = None, echo = True):
-    (stdout, stderr) = proc.communicate()
-    retcode = proc.wait()
- 
-    if len(stdout) == 0:
-        stdout = 'None'
-    
-    if len(stderr) == 0:
-        stderr = 'None'
-        
-    result = "returncode: " + str(retcode) + "\n\t\tstdout: " + stdout + "\n\t\tstderr: " + stderr
-    
-    if not 'remote upstream already exists' in result:
-        if len(result) > 0 and echo:
-            print("\t\t"+result)
-        else:
-            print("\t\tOK")
-    
-    if resultFile != None:
-        try:
-            resultFile.write("\tresult:"+result+"\n")
-        except:
-            pass
-            
-    return (result, retcode)
+	(stdout, stderr) = proc.communicate()
+	retcode = proc.wait()
+	
+	stdout = stdout.decode('utf-8')
+	stderr = stderr.decode('utf-8')
+	
+	print(stdout)
+
+	if len(stdout) == 0:
+		stdout = 'None'
+
+	if len(stderr) == 0:
+		stderr = 'None'
+		
+	result = "returncode: " + str(retcode) + "\n\t\tstdout: " + stdout + "\n\t\tstderr: " + stderr
+
+	if not 'remote upstream already exists' in result:
+		if len(result) > 0 and echo:
+		    print("\t\t"+result)
+		else:
+		    print("\t\tOK")
+
+	if resultFile != None:
+		try:
+		    resultFile.write("\tresult:"+result+"\n")
+		except:
+		    pass
+		    
+	return (result, retcode)
     
 def CatchUpMaster():
     print("Catch up master")
@@ -1971,12 +1975,9 @@ def processResult(result,  msg,  resultFile,  buildFailed=False,  testFailed=Fal
 
     msg = msg.replace('[32m','').replace('[33m','').replace('[0m', '\\n').replace('[31m', '\\n').replace('\<','').replace('/>','').replace('\n', '\\n').replace('"', '\'')
 
-    if type(msg) == type(' '):
-        msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
-        msg = repr(msg)
-    else:
-        msg = repr(msg)
-    
+    msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
+    msg = repr(msg)
+
     if allPassed:
         msg = msg.replace('Automated Smoketest',  'Automated Smoketest: '+ passEmoji)
     else:
@@ -2052,7 +2053,7 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
         curTime = time.strftime("%y-%m-%d-%H-%M-%S")
         testInfo['startTime'] = curTime
         resultFileName= "result-" + curTime + ".log"
-        resultFile = open(resultFileName,  "w", 0)
+        resultFile = open(resultFileName,  "w")
         
         # First or new build
         isBuild=False
@@ -2291,6 +2292,8 @@ def ProcessOpenPulls(prs,  numOfPrToTest):
                     myProc = subprocess.Popen([ cmd ],  shell=True,  bufsize=8192,  stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 
                     (myStdout,  myStderr) = myProc.communicate()
+                    myStdout = myStdout.decode('utf-8')
+                    myStderr = myStderr.decode('utf-8')
                 except:
                     print("Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" )
                     pass
@@ -2654,23 +2657,21 @@ def cleanUp(smoketestHome):
             os.mkdir(oldLogsDir)
 
         print("\nMove old logs (>6 days) onto " + oldLogsDir +" directory.")
-        myProc = subprocess.Popen(["find . -maxdepth 1 -type f -mtime +6 -name 'prp-*' -print -exec mv '{}' " + oldLogsDir +"/. \;"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-        (myStdout,  myStderr) = myProc.communicate()
-        result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-        print("Result:"+result)
+        myProc = subprocess.Popen(["find . -maxdepth 1 -type f -mtime +6 -name 'prp-*' -print -exec mv '{}' " + oldLogsDir +"/. \;"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE) 
+        result = formatResult(myProc)
+        print("Result: " + result.result)
 
         myProc = subprocess.Popen(["find . -maxdepth 1 -type f -mtime +6 -name 'bokeh-*' -print -exec mv '{}' " + oldLogsDir +"/. \;"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-        (myStdout,  myStderr) = myProc.communicate()
-        result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-        print("Result:"+result)
+        result = formatResult(myProc)
+        print("Result: " + result.result)
 
         
         if removeMasterAtExit:
             print("\nRemove HPCC-Platform (master) to force clone it at the next start.")
             myProc = subprocess.Popen(["sudo rm -rf HPCC-Platform"],  shell=True,  bufsize=8192, stdin=subprocess.PIPE, stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
-            (myStdout,  myStderr) = myProc.communicate()
-            result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
-            print("Result:"+result)
+            result = formatResult(myProc)
+            print("Result: " + result.result)
+
             
     except:
         print("Unexpected error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" )
@@ -2896,7 +2897,7 @@ if __name__ == '__main__':
         (prs, numOfPrToTest) = GetOpenPulls(knownPullRequests)
 
         #print prs
-        CleanUpClosedPulls(knownPullRequests,  smoketestHome)
+        CleanUpClosedPulls(knownPullRequests,  "/home/noah/Downloads/scripts")
 
         CatchUpMaster()
 

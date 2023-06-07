@@ -194,3 +194,42 @@ Current Fix:
 ```
 if testPrNo > 0:
 ```
+
+**formatResult() & How it is Called Changes**
+
+Addition to formatResult():
+```
+	stdout = stdout.decode('utf-8')
+	stderr = stderr.decode('utf-8')
+```
+
+Original:
+```
+        (myStdout,  myStderr) = myProc.communicate()
+        result = "returncode:" + str(myProc.returncode) + ", stdout:'" + myStdout + "', stderr:'" + myStderr + "'."
+        print("Result:"+result)
+```
+Updated Version:
+```
+        result = formatResult(myProc)
+        print("Result: " + result.result)
+```
+
+**If-else change on line 1975**
+
+Original:
+```
+    if type(msg) == type(' '):
+        msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
+        msg = repr(msg)
+    else:
+        msg = repr(msg)
+```
+
+Updated Version:
+```
+    msg = unicodedata.normalize('NFKD', msg).encode('ascii','ignore').replace('\'','').replace('\\u', '\\\\u')
+    msg = repr(msg)
+```
+
+
