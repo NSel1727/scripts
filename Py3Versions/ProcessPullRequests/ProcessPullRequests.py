@@ -1318,6 +1318,7 @@ def CatchUpMaster():
         
     except:
         print("Internal error:" + str(sys.exc_info()[0]) + " (line: " + str(inspect.stack()[0][2]) + ")" )
+        traceback.print_stack()
         pass
     
     finally:
