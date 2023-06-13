@@ -69,6 +69,8 @@ Line 906: "#WritePlainLog "Let's start HPCC system" "$logFile""
 
 Line 961: "#${cmd} 2>&1 | tee -a $logFile"
 
+Line 978: "#${cmd} 2>&1  | tee -a $logFile"
+
 Lines 985-986: "#WritePlainLog "pushd ${TEST_DIR}" "$logFile"
                 #pushd ${TEST_DIR}"
                 
