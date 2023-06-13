@@ -117,3 +117,9 @@ Lines 1381-1386: "#    CheckResult "$logFile"
 				  #    ReportTimes "$logFile"
 				  #
 				  #    exit 1"
+				  
+				
+##Additional Changes
+
+egrep -> grep -E
+

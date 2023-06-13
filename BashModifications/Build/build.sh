@@ -343,7 +343,7 @@ WritePlainLog "Loglevel: ${LOGLEVEL}" "$logFile"
 #--------------------------------------
 # Check plugins (especially Pythons) and apply exclusion if it is need
 
-additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.in | egrep '^additionalPlugins'| cut -d= -f2 ))
+additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.in | grep -E '^additionalPlugins'| cut -d= -f2 ))
 for plugin in ${additionalPlugins[*]}
 do 
     upperPlugin=${plugin^^} 
@@ -374,8 +374,8 @@ do
                         REGRESSION_TEST=${REGRESSION_TEST}" *py*"
                     fi
                     
-                    WritePlainLog "line in suite: $( egrep '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )'." "$logFile"
-                    excludeInclude=$( egrep -c '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )
+                    WritePlainLog "line in suite: $( grep -E '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )'." "$logFile"
+                    excludeInclude=$( grep -E -c '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )
                     WritePlainLog "excludeInclude: ${excludeInclude} (path: $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py)" "$logFile"
 
                     [[ $excludeInclude -eq 1 ]] && GLOBAL_EXCLUSION="$GLOBAL_EXCLUSION -r=python3"
@@ -449,7 +449,7 @@ cd $PR_ROOT
 cd ${BUILD_ROOT}
 
 MAKE_FILE="$SOURCE_ROOT/cmake_modules/buildBOOST_REGEX.cmake"
-BOOST_URL=$( egrep 'URL ' $MAKE_FILE | awk '{print $2}')
+BOOST_URL=$( grep -E 'URL ' $MAKE_FILE | awk '{print $2}')
 BOOST_PKG=${BOOST_URL##*/}; 
 res=$( wget -v --spider  $BOOST_URL )
 isDownloadable=$?
@@ -466,7 +466,7 @@ then
 
             WritePlainLog "Hack 'HPCC-Platform/cmake_modules/buildBOOST_REGEX.cmake' to use local copy" "$logFile"
             sed -i -e 's/URL \(.*\)$/URL '"${HOME//\//\\/}\/$BOOST_PKG"'/g' -e 's/URL_HASH/# URL_HASH/g' -e 's/TIMEOUT \(.*\)/TIMEOUT 90/g'  $MAKE_FILE
-            res=$( egrep 'URL |URL_HASH|TIMEOUT' $MAKE_FILE )
+            res=$( grep -E 'URL |URL_HASH|TIMEOUT' $MAKE_FILE )
             WritePlainLog "res:\n$res" "$logFile"
 
             #wget -v  -O ${BUILD_ROOT}/downloads/boost_1_71_0.tar.gz  https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
@@ -479,7 +479,7 @@ then
 else
     WritePlainLog "The $BOOST_PKG is downloadable." "$logFile"
     sed -e 's/TIMEOUT \(.*\)/TIMEOUT 180/g' ${MAKE_FILE} >temp.cmake && sudo mv -f temp.cmake ${MAKE_FILE}
-    res=$( egrep 'URL |TIMEOUT' $MAKE_FILE )
+    res=$( grep -E 'URL |TIMEOUT' $MAKE_FILE )
     WritePlainLog "res:\n$res" "$logFile"
 fi
 
@@ -836,7 +836,7 @@ then
 
         # Ensure no componenets are running
         sudo /etc/init.d/hpcc-init status >> $logFile 2>&1
-        IS_THOR_ON_DEMAND=$( sudo /etc/init.d/hpcc-init status | egrep -i -c 'mythor \[OD\]' )
+        IS_THOR_ON_DEMAND=$( sudo /etc/init.d/hpcc-init status | grep -E -i -c 'mythor \[OD\]' )
         WritePlainLog ""  "$logFile"
 
         hpccRunning=$( sudo /etc/init.d/hpcc-init status | grep -c "running")
@@ -855,7 +855,7 @@ then
         # Let's start
         TIME_STAMP=$(date +%s)
         HPCC_STARTED=1
-        [ -z $NUMBER_OF_HPCC_COMPONENTS ] && NUMBER_OF_HPCC_COMPONENTS=$( sudo /opt/HPCCSystems/sbin/configgen -env /etc/HPCCSystems/environment.xml -list | egrep -i -v 'eclagent' | wc -l )
+        [ -z $NUMBER_OF_HPCC_COMPONENTS ] && NUMBER_OF_HPCC_COMPONENTS=$( sudo /opt/HPCCSystems/sbin/configgen -env /etc/HPCCSystems/environment.xml -list | grep -E -i -v 'eclagent' | wc -l )
         
         if [[ $IS_THOR_ON_DEMAND -ne 0 ]]
         then
@@ -1012,7 +1012,7 @@ then
                         then
                             timeout=${TEST[1]}
                             # Check if test already has '//timeout' tag
-                            if [[ $( egrep -c '\/\/timeout' $file ) -eq 0 ]]
+                            if [[ $( grep -E -c '\/\/timeout' $file ) -eq 0 ]]
                             then
                                 # it has not, add one at the beginning of the file
                                 mv -fv $file $file-back
@@ -1049,7 +1049,7 @@ then
                 # Check if there is no error in Setup phase
                 if [[ -f ${PR_ROOT}/setup.summary ]]
                 then
-                    numberOfNotFailedEngines=$( cat ${PR_ROOT}/setup.summary | egrep -o '\<failed:0\>' | wc -l )
+                    numberOfNotFailedEngines=$( cat ${PR_ROOT}/setup.summary | grep -E -o '\<failed:0\>' | wc -l )
                     if [[ $numberOfNotFailedEngines -ne 3 ]]
                     then
                         setupPassed=0
@@ -1127,7 +1127,7 @@ then
                             ProcessLog "${PR_ROOT}/HPCCSystems-regression/log/" "roxie" "$logFile"
                         else
                             WritePlainLog "Command failed : ${retVal}" "$logFile"
-                            inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" | egrep -v 'HPCC-Platform/docs/|docbookx.dtd' )
+                            inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" | grep -E -v 'HPCC-Platform/docs/|docbookx.dtd' )
                             WritePlainLog "${inSuiteErrorLog}" "$logFile"
                         fi
                     fi
@@ -1284,7 +1284,7 @@ then
         do 
             WritePlainLog "Core trace file: $trc" "$logFile"
 
-            wuid=$( cat $trc | egrep 'was generated' | sed -e 's/.*\(W2[0-9].*\)\s.*/\1/')
+            wuid=$( cat $trc | grep -E 'was generated' | sed -e 's/.*\(W2[0-9].*\)\s.*/\1/')
             WritePlainLog "wuid:$wuid" "$logFile"
 
             zap=$(find HPCCSystems-regression/zap/ -iname '*'"$wuid"'*' -type f -print)
