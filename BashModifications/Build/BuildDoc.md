@@ -20,6 +20,11 @@ Lines 214-218: "# Experimental to use RAMDisk tas build directory
     #sudo mount -t tmpfs -o noatime,size=6G tmpfs $(pwd)/${BUILD_ROOT}
     #WritePlainLog " $( mount | egrep '/home/ati/Smoketest' )" "$resultFile""
     
+Lines 433-436: "#echo "Update Git submodules"
+				#echo "Update Git submodules" >> $logFile 2>&1
+
+				#git submodule update --init --recursive"
+    
 Lines 481-488: "#mkdir -p ${BUILD_ROOT}/downloads/boost_1_71_0
             #res=$( cp -v $HOME/boost_1_71_0.tar.gz ${BUILD_ROOT}/downloads/ 2>&1 )
             #WritePlainLog "res: ${res}" "$logFile"
@@ -29,6 +34,7 @@ Lines 481-488: "#mkdir -p ${BUILD_ROOT}/downloads/boost_1_71_0
             #WritePlainLog "retcode: $?" "$logFile"
             #popd"
     
+Line 495: "#wget -v  -O ${BUILD_ROOT}/downloads/boost_1_71_0.tar.gz  https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz"
 Lines 497-499: "#MAKE_FILE="../HPCC-Platform/cmake_modules/buildBOOST_REGEX.cmake"
             #sed -e 's/TIMEOUT \(.*\)/TIMEOUT 60/g' ${MAKE_FILE} >temp.cmake && sudo mv -f temp.cmake ${MAKE_FILE}
             #WritePlainLog "There is $( egrep 'TIMEOUT' ${MAKE_FILE} )" "$logFile""        

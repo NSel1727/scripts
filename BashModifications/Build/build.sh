@@ -106,6 +106,7 @@ echo "Content of /usr/local/share/aclocal/ " >> $logFile 2>&1
 ls -l  /usr/local/share/aclocal/ >> $logFile 2>&1
 echo "====================================================" >> $logFile 2>&1
 
+#Intern TODO: Determine if this function is still necessary since it is never called anywhere
 MyEcho ()
 {
     param=$1
@@ -414,12 +415,6 @@ git clone https://github.com/AttilaVamos/OBT.git >> ${logFile} 2>&1
 popd
 WritePlainLog "Done." "$logFile"
 
-
-#echo "Update Git submodules"
-#echo "Update Git submodules" >> $logFile 2>&1
-
-#git submodule update --init --recursive
-
 #-------------------------------------------------
 #
 # Set core file generation and be named core_[program].[pid]
@@ -469,7 +464,6 @@ then
             res=$( grep -E 'URL |URL_HASH|TIMEOUT' $MAKE_FILE )
             WritePlainLog "res:\n$res" "$logFile"
 
-            #wget -v  -O ${BUILD_ROOT}/downloads/boost_1_71_0.tar.gz  https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
             WritePlainLog "$( ls -l ${BUILD_ROOT}/downloads/*.gz )" "$logFile"
      
         fi
@@ -524,6 +518,7 @@ CMAKE_CMD+=$' -D CMAKE_BUILD_TYPE='$BUILD_TYPE
 if [[ ( "${SYSTEM_ID}" =~ "Ubuntu_16_04" ) ]]
 then
       # On Ubuntu 16.04 RPR VM I have not proper Python 3.6 so avoid to build plugins and Python stuff
+      #INTERN TODO: Is USE_PYTHON3=OFF necessary
       CMAKE_CMD+=$' -D INCLUDE_PLUGINS=OFF -D TEST_PLUGINS=OFF -DSUPPRESS_PY3EMBED=ON -DINCLUDE_PY3EMBED=OFF -DSUPPRESS_PY2EMBED=ON -DINCLUDE_PY2EMBED=OFF -D USE_PYTHON3=OFF -DINCLUDE_JAVAEMBED=ON'
 else
       CMAKE_CMD+=$' -D INCLUDE_PLUGINS=ON -D TEST_PLUGINS=1 '${PYTHON_PLUGIN}
