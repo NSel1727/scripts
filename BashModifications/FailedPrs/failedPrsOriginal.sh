@@ -24,7 +24,7 @@ then
 else
     param=$1
     upperParam=${param^^}
-
+    # echo "Param: ${upperParam}"
     case $upperParam in
 
 	YEST*) day=$( date -I -d "$today - 1 day" )
@@ -50,7 +50,7 @@ echo ""
 if [[ -f ${logFileName} ]]
 then
     echo "Failed PRs on ${day}:"
-    cat prp-${day}.log | grep -E '^([0-9]*)/([0-9]*)\. Process|wait|^(\s*)sha|^(\s*)base|^(\s*)user|HPCC Star|^(\s*)start|^(\s*)end|^(\s*)pass|scheduled|done, exit' | grep -E -i -B7 'pass : False' | grep -E 'PR-' | sed -n 's/^\(.*\)\s\(PR-[0-9].*\),\(.*\)$/    \2/p' | sort -u
+    cat prp-${day}.log | egrep '^([0-9]*)/([0-9]*)\. Process|wait|^(\s*)sha|^(\s*)base|^(\s*)user|HPCC Star|^(\s*)start|^(\s*)end|^(\s*)pass|scheduled|done, exit' | egrep -i -B7 'pass : False' | egrep 'PR-' | sed -n 's/^\(.*\)\s\(PR-[0-9].*\),\(.*\)$/    \2/p' | sort -u
 else
     echo "We have not log file for ${day}. Try it in the log achive."
 fi
