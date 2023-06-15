@@ -167,9 +167,9 @@ do
                 
         baseTest*) BASE_TEST=${param}
                 WriteLog "Base test: ${BASE_TEST}" "$LOG_FILE"
-
-
-
+#                BASE_TAG=${param//baseTest=/}
+#                BASE_TAG=${BASE_TAG//\"/}
+#                WriteLog "Execute base test with tag: ${BASE_TAG}" "$LOG_FILE"
                 ;;
                 
         base*) BASE=${param//base=/}
@@ -237,15 +237,13 @@ WriteLog "Param: region= ${REGION}" "$LOG_FILE"
 SSH_KEYFILE="~/HPCC-Platform-Smoketest.pem"
 SSH_OPTIONS="-oConnectionAttempts=3 -oConnectTimeout=20 -oStrictHostKeyChecking=no"
 
-
+#AMI_ID=$( aws ec2 describe-images --owners 446598291512 | egrep -i '"name"|imageid' | egrep -i -A2 '-el7-' | egrep -i '"ImageId"' | tr -d " " | cut -d":" -f2 )
 # Better approach
 # CentOS 7
 NEW_AMI=0
 AMI_ID=$( aws ec2 describe-images --owners 446598291512 --filters "Name=name,Values=*dev-el7-x86_64" --query Images[].ImageId --output text )
 [ -z "${AMI_ID}" ] && AMI_ID=$( aws ec2 describe-images --owners 446598291512 --filters "Name=name,Values=*dev-el7-x86_64-2021" --query Images[].ImageId --output text ) || NEW_AMI=1
 [ -z "${AMI_ID}" ] && AMI_ID="ami-0f6f902a9aff6d384"
-
-#Intern TODO: See why CentOS8 is not preferred
 # CentOS 8
 #AMI_ID=$( aws ec2 describe-images --owners 446598291512 --filters "Name=name,Values=*-el8-x86_64" --query Images[].ImageId --output text )
 #[ -z ${AMI_ID} ] && AMI_ID="ami-0c464387e25013b1f"
@@ -262,16 +260,17 @@ else
 fi
 
 WriteLog "Create instance for ${INSTANCE_NAME}, type: $INSTANCE_TYPE, disk: $instanceDiskVolumeSize, build ${DOCS_BUILD}" "$LOG_FILE"
-
-
-
+#cmd=aws ec2 run-instances --image-id ${AMI_ID} --count 1 --instance-type $INSTANCE_TYPE --key-name HPCC-Platform-Smoketest --security-group-ids ${SECURITY_GROUP_ID} --subnet-id ${SUBNET_ID} --instance-initiated-shutdown-behavior terminate --block-device-mappings "[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":$instanceDiskVolumeSize,\"DeleteOnTermination\":true,\"Encrypted\":true}}]"
+#cmd="aws ec2 run-instances --image-id ${AMI_ID} --count 1 --instance-type $INSTANCE_TYPE --key-name HPCC-Platform-Smoketest --security-group-ids ${SECURITY_GROUP_ID} --subnet-id ${SUBNET_ID} --instance-initiated-shutdown-behavior terminate --block-device-mappings \"[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":$instanceDiskVolumeSize,\"DeleteOnTermination\":true,\"Encrypted\":true}}]"
+#echo "cmd:$cmd"
 instance=$( aws ec2 run-instances --image-id ${AMI_ID} --count 1 --instance-type $INSTANCE_TYPE --key-name HPCC-Platform-Smoketest --security-group-ids ${SECURITY_GROUP_ID} --subnet-id ${SUBNET_ID} --instance-initiated-shutdown-behavior terminate --block-device-mappings "[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":$instanceDiskVolumeSize,\"DeleteOnTermination\":true,\"Encrypted\":true}}]" 2>&1 )
-
+#instance=$( eval ${cmd} )
+#instance=$( aws ec2 run-instances --launch-template LaunchTemplateId=lt-0f4cd6101ec4d94ea --count 1 --key-name HPCC-Platform-Smoketest --instance-initiated-shutdown-behavior terminate --block-device-mappings "[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":$instanceDiskVolumeSize,\"DeleteOnTermination\":true,\"Encrypted\":true}}]" 2>&1 )
 retCode=$?
 WriteLog "Ret code: $retCode" "$LOG_FILE"
 WriteLog "Instance: $instance" "$LOG_FILE"
 
-instanceId=$( echo "$instance" | grep -E 'InstanceId' | tr -d '", ' | cut -d : -f 2 )
+instanceId=$( echo "$instance" | egrep 'InstanceId' | tr -d '", ' | cut -d : -f 2 )
 WriteLog "Instance ID: $instanceId" "$LOG_FILE"
 
 if [[ -z "$instanceId" ]]
@@ -287,7 +286,7 @@ then
     MyExit "-1" "Instance creation failed, exit" "$instance" "${INSTANCE_NAME}" "${C_ID}"
 fi
 
-instanceInfo=$( aws ec2 describe-instances --instance-ids ${instanceId} 2>&1 | grep -E -i 'instan|status|publicip|privateip|volume' )
+instanceInfo=$( aws ec2 describe-instances --instance-ids ${instanceId} 2>&1 | egrep -i 'instan|status|publicip|privateip|volume' )
 WriteLog "Instance info: $instanceInfo" "$LOG_FILE"
 
 if [[ $instanceInfo =~ "InvalidInstanceID.NotFound" ]]
@@ -304,9 +303,9 @@ then
 fi
 if [[ $REGION =~ 'us-east-1' ]]
 then
-    instancePublicIp=$( echo "$instanceInfo" | grep -E 'PrivateIpAddress' | head -n 1 | tr -d '", ' | cut -d : -f 2 )
+    instancePublicIp=$( echo "$instanceInfo" | egrep 'PrivateIpAddress' | head -n 1 | tr -d '", ' | cut -d : -f 2 )
 else
-    instancePublicIp=$( echo "$instanceInfo" | grep -E 'PublicIpAddress' | tr -d '", ' | cut -d : -f 2 )
+    instancePublicIp=$( echo "$instanceInfo" | egrep 'PublicIpAddress' | tr -d '", ' | cut -d : -f 2 )
 fi
 
 tryCount=5
@@ -315,13 +314,13 @@ while [[ -z "$instancePublicIp" ]]
 do
     WriteLog "Instance has not public IP yet, wait for ${delay} sec and try again." "$LOG_FILE"
     sleep ${delay}
-    instanceInfo=$( aws ec2 describe-instances --instance-ids ${instanceId} 2>&1 | grep -E -i 'instan|status|publicip|privateip|volume' )
+    instanceInfo=$( aws ec2 describe-instances --instance-ids ${instanceId} 2>&1 | egrep -i 'instan|status|publicip|privateip|volume' )
     WriteLog "Instance info: $instanceInfo" "$LOG_FILE"
     if [[ $REGION =~ 'us-east-1' ]]
     then
-        instancePublicIp=$( echo "$instanceInfo" | grep -E 'PrivateIpAddress' | head -n 1 | tr -d '", ' | cut -d : -f 2 )
+        instancePublicIp=$( echo "$instanceInfo" | egrep 'PrivateIpAddress' | head -n 1 | tr -d '", ' | cut -d : -f 2 )
     else
-        instancePublicIp=$( echo "$instanceInfo" | grep -E 'PublicIpAddress' | tr -d '", ' | cut -d : -f 2 )
+        instancePublicIp=$( echo "$instanceInfo" | egrep 'PublicIpAddress' | tr -d '", ' | cut -d : -f 2 )
     fi
     WriteLog "Public IP: '${instancePublicIp}'" "$LOG_FILE"
     tryCount=$(( $tryCount - 1 ))
@@ -351,7 +350,7 @@ res=$( ssh-keygen -R ${instancePublicIp} -f ~/.ssh/known_hosts 2>&1 )
 WriteLog "Res: ${res}\n" "$LOG_FILE"
 
 
-volumeId=$( echo "$instanceInfo" | grep -E 'VolumeId' | tr -d '", ' | cut -d : -f 2 )
+volumeId=$( echo "$instanceInfo" | egrep 'VolumeId' | tr -d '", ' | cut -d : -f 2 )
 WriteLog "Volume ID: $volumeId" "$LOG_FILE"
 
 tag=$( aws ec2 create-tags --resources ${instanceId} ${volumeId} \
@@ -391,7 +390,7 @@ do
         instanceIsUp=1
         break
     else
-        isTerminated=$( aws ec2 describe-instances --instance-ids ${instanceId} --filters "Name=tag:PR,Values=${INSTANCE_NAME}" --query "Reservations[].Instances[].State[].Name" | grep -E -c 'terminated|stopped'  )
+        isTerminated=$( aws ec2 describe-instances --instance-ids ${instanceId} --filters "Name=tag:PR,Values=${INSTANCE_NAME}" --query "Reservations[].Instances[].State[].Name" | egrep -c 'terminated|stopped'  )
         if [[ $isTerminated -ne 0 ]]
         then
             WriteLog "Instance is terminated, exit" "$LOG_FILE"
@@ -450,7 +449,7 @@ then
     REQUIRED_FOR_VCPKG_BUILD=candidate-8.8.x
     WriteLog "Required for VCPKG build: $REQUIRED_FOR_VCPKG_BUILD" "$LOG_FILE"
     [ $(printf "%s\n" "$REQUIRED_FOR_VCPKG_BUILD" "$BASE" | sort -V | head -n1) = $REQUIRED_FOR_VCPKG_BUILD ] && VCPKG_INSTALLS_NEWER_VERSION=1 || VCPKG_INSTALLS_NEWER_VERSION=0
-
+    #[[  "candidate-8.6.x candidate-8.4.x candidate-8.2.x" =~ "$BASE" ]] && VCPKG_INSTALLS_NEWER_VERSION=0 || VCPKG_INSTALLS_NEWER_VERSION=1
     WriteLog "VCPKG_INSTALLS_NEWER_VERSION: $VCPKG_INSTALLS_NEWER_VERSION" "$LOG_FILE"
     
     BOOST_PKG=$( find ~/ -iname 'boost_1_71*' -type f -size +100M -print | head -n 1 )
@@ -513,8 +512,9 @@ then
     #res=$( rsync -vapE --timeout=60 -e "ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS}" ${SMOKETEST_HOME}/init-cos8.sh centos@${instancePublicIp}:/home/centos/init.sh 2>&1 )
     WriteLog "Res: $res" "$LOG_FILE"
 
-
-
+#    WriteLog "Set it to executable" "$LOG_FILE"
+#    res=$( ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS} centos@${instancePublicIp} "chmod +x init.sh" 2>&1 )
+#    WriteLog "Res: $res" "$LOG_FILE"
 
     WriteLog "Check user directory" "$LOG_FILE"
     res=$( ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS} centos@${instancePublicIp} "ls -l" 2>&1 )
@@ -581,14 +581,14 @@ then
         if [[ $? -ne 0 ]]
         then
             # Something is wrong, try to find out what
-            timeOut=$( echo "$smoketestIsRunning" | grep -E 'timed out' | wc -l);
+            timeOut=$( echo "$smoketestIsRunning" | egrep 'timed out' | wc -l);
             if [[ $timeOut -eq 0 ]]
             then
                 WriteLog "Ssh error, try again" "$LOG_FILE"
                 smoketestIsRunning=1
             else
                 WriteLog "Ssh timed out, chek if the instance is still running" "$LOG_FILE"
-                isTerminated=$( aws ec2 describe-instances --instance-ids ${instanceId} --filters "Name=tag:PR,Values=${INSTANCE_NAME}" --query "Reservations[].Instances[].State[].Name" | grep -E -c 'terminated|stopped'  )
+                isTerminated=$( aws ec2 describe-instances --instance-ids ${instanceId} --filters "Name=tag:PR,Values=${INSTANCE_NAME}" --query "Reservations[].Instances[].State[].Name" | egrep -c 'terminated|stopped'  )
                 if [[ $isTerminated -ne 0 ]]
                 then
                     WriteLog "Instance is terminated, exit" "$LOG_FILE"
@@ -643,7 +643,7 @@ then
     timestamp=$(date "+%Y-%m-%d_%H-%M-%S")
      # Move all *.log, *test*.summary, *.diff, *.txt and *.old files into a zip archive.
     # TO-DO check if there any. e.g. for a new PR there is not any file to archive
-    res=$( find ${SMOKETEST_HOME}/${INSTANCE_NAME}/ -maxdepth 1 -mmin +$age -type f -iname '*.log' -o -iname '*test*.summary' -o -iname '*.diff' -o -iname '*.txt' -o -iname '*.old' | grep -E -v 'result-|RelWith|init-' | zip -m -u ${SMOKETEST_HOME}/${INSTANCE_NAME}/old-logs-${timestamp} -@ 2>&1 )
+    res=$( find ${SMOKETEST_HOME}/${INSTANCE_NAME}/ -maxdepth 1 -mmin +$age -type f -iname '*.log' -o -iname '*test*.summary' -o -iname '*.diff' -o -iname '*.txt' -o -iname '*.old' | egrep -v 'result-|RelWith|init-' | zip -m -u ${SMOKETEST_HOME}/${INSTANCE_NAME}/old-logs-${timestamp} -@ 2>&1 )
     WriteLog "Res: $res" "$LOG_FILE"
     
     WriteLog "Compress and download result" "$LOG_FILE"
@@ -653,7 +653,7 @@ then
     
     WriteLog "Find and compress log files from /home/centos/smoketest/${INSTANCE_NAME}/build/vcpkg_buildtrees/ directory" "$LOG_FILE"
     res=$( ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS} centos@${instancePublicIp} "find /home/centos/smoketest/${INSTANCE_NAME}/build/vcpkg_buildtrees/ -iname '*.log' -type f | zip /home/centos/smoketest/${INSTANCE_NAME}/vcpkg_buildtrees_log-$(date '+%y-%m-%d_%H-%M-%S') -@ "  2>&1 )
-
+   #res=$( rsync -va --timeout=60 -e "ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS}" centos@${instancePublicIp}:/home/centos/smoketest/${INSTANCE_NAME}/build/vcpkg_buildtrees/*/*.log ${SMOKETEST_HOME}/${INSTANCE_NAME}/ 2>&1 )
     WriteLog "Res: $res" "$LOG_FILE"
     
     WriteLog "Remove /home/centos/smoketest/${INSTANCE_NAME}/HPCC-Platform /home/centos/smoketest/${INSTANCE_NAME}/build directory" "$LOG_FILE"
@@ -719,7 +719,7 @@ fi
 sleep 10
 
 WriteLog "Instance:" "$LOG_FILE"
-res=$( aws ec2 describe-instances --instance-ids ${instanceId} --filters "Name=tag:PR,Values=${INSTANCE_NAME}" "Name=tag:Commit,Values=${C_ID}" | grep -E -i 'instan|status|public' 2>&1 )
+res=$( aws ec2 describe-instances --instance-ids ${instanceId} --filters "Name=tag:PR,Values=${INSTANCE_NAME}" "Name=tag:Commit,Values=${C_ID}" | egrep -i 'instan|status|public' 2>&1 )
 WriteLog "Res: $res" "$LOG_FILE"
 
 WriteLog "End." "$LOG_FILE"
