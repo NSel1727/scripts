@@ -171,7 +171,7 @@ WritePlainLog "Loglevel: ${LOGLEVEL}" "$logFile"
 #--------------------------------------
 # Check plugins (especially Pythons) and apply exclusion if it is need
 
-additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.in | egrep '^additionalPlugins'| cut -d= -f2 ))
+additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.in | grep -E '^additionalPlugins'| cut -d= -f2 ))
 for plugin in ${additionalPlugins[*]}
 do 
     upperPlugin=${plugin^^} 
@@ -444,7 +444,7 @@ then
 
     # Ensure no componenets are running
     $TARGET_DIR/etc/init.d/hpcc-init status  >> $logFile 2>&1
-    IS_THOR_ON_DEMAND=$( $TARGET_DIR/etc/init.d/hpcc-init status | egrep -i -c 'mythor \[OD\]' )
+    IS_THOR_ON_DEMAND=$( $TARGET_DIR/etc/init.d/hpcc-init status | grep -E -i -c 'mythor \[OD\]' )
     WritePlainLog ""  "$logFile"
 
     hpccRunning=$( $TARGET_DIR/etc/init.d/hpcc-init status  | grep -c "running")
@@ -463,7 +463,7 @@ then
     # Let's start
     TIME_STAMP=$(date +%s)
     HPCC_STARTED=1
-    [ -z $NUMBER_OF_HPCC_COMPONENTS ] && NUMBER_OF_HPCC_COMPONENTS=$( $TARGET_DIR/opt/HPCCSystems/sbin/configgen -env $TARGET_DIR/etc/HPCCSystems/environment.xml -list | egrep -i -v 'eclagent' | wc -l )
+    [ -z $NUMBER_OF_HPCC_COMPONENTS ] && NUMBER_OF_HPCC_COMPONENTS=$( $TARGET_DIR/opt/HPCCSystems/sbin/configgen -env $TARGET_DIR/etc/HPCCSystems/environment.xml -list | grep -E -i -v 'eclagent' | wc -l )
     
     if [[ $IS_THOR_ON_DEMAND -ne 0 ]]
     then
@@ -589,7 +589,7 @@ then
             # Check if there is no error in Setup phase
             if [[ -f ${PR_ROOT}/setup.summary ]]
             then
-                numberOfNotFailedEngines=$( cat ${PR_ROOT}/setup.summary | egrep -o '\<failed:0\>' | wc -l )
+                numberOfNotFailedEngines=$( cat ${PR_ROOT}/setup.summary | grep -E -o '\<failed:0\>' | wc -l )
                 if [[ $numberOfNotFailedEngines -ne 3 ]]
                 then
                     setupPassed=0
