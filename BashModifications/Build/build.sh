@@ -106,13 +106,6 @@ echo "Content of /usr/local/share/aclocal/ " >> $logFile 2>&1
 ls -l  /usr/local/share/aclocal/ >> $logFile 2>&1
 echo "====================================================" >> $logFile 2>&1
 
-#Intern TODO: Determine if this function is still necessary since it is never called anywhere
-MyEcho ()
-{
-    param=$1
-    WritePlainLog "${param}" "$resultFile"
-}
-
 MyExit ()
 {
     exitCode=$1

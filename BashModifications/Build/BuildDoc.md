@@ -129,3 +129,12 @@ Lines 1381-1386: "#    CheckResult "$logFile"
 
 egrep -> grep -E
 
+Removed MyEcho Function:
+```
+MyEcho ()
+{
+    param=$1
+    WritePlainLog "${param}" "$resultFile"
+}
+```
+
