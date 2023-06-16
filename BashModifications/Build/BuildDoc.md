@@ -129,6 +129,17 @@ Lines 1381-1386: "#    CheckResult "$logFile"
 
 egrep -> grep -E
 
+This if statement is removed, only the line after else is kept.
+```
+if [[ ( "${SYSTEM_ID}" =~ "Ubuntu_16_04" ) ]]
+then
+      # On Ubuntu 16.04 RPR VM I have not proper Python 3.6 so avoid to build plugins and Python stuff
+      CMAKE_CMD+=$' -D INCLUDE_PLUGINS=OFF -D TEST_PLUGINS=OFF -DSUPPRESS_PY3EMBED=ON -DINCLUDE_PY3EMBED=OFF -DSUPPRESS_PY2EMBED=ON -DINCLUDE_PY2EMBED=OFF -D USE_PYTHON3=OFF -DINCLUDE_JAVAEMBED=ON'
+else
+      CMAKE_CMD+=$' -D INCLUDE_PLUGINS=ON -D TEST_PLUGINS=1 '${PYTHON_PLUGIN}
+fi
+```
+
 Removed MyEcho Function:
 ```
 MyEcho ()

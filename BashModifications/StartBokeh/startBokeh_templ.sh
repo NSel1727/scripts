@@ -17,7 +17,7 @@ echo "Bokeh: $BOKEH"
 
 PYTHON_MAIN_VERSION=$( ${BOKEH} info | grep -E '^Python' | awk '{ print $4 }' | cut -d. -f1)
 echo "Python main version: $PYTHON_MAIN_VERSION"
-#INTERN TODO: Determine if this is necessary since the testing files will be converte to 3
+#INTERN TODO: Determine if this is necessary since the testing files will be converted to 3
 if [[ ${PYTHON_MAIN_VERSION} -eq 3 ]]
 then
     PYTHON_APPS="listTests3.py showStatus.py"
