@@ -9,7 +9,6 @@ PR_ROOT=${pwd}
 PR_ROOT_ESCAPED=${PR_ROOT//\//\\/}
 SOURCE_ROOT=${PR_ROOT}/HPCC-Platform
 BUILD_TYPE=RelWithDebInfo
-#BUILD_TYPE=Debug
 TEST_DIR=${SOURCE_ROOT}/testing/regress
 ESP_TEST_DIR=${SOURCE_ROOT}/testing/esp/wudetails
 TARGET_DIR=hpcc
@@ -50,12 +49,6 @@ cp -f ../utils.sh .
 archiveOldLogs "$logFile" "$date"
 
 cleanUpLeftovers "$logFile" 
-
-#res=$(  exec >> ${logFile} 2>&1 )
-#exec > ${logFile} 2>&1
-#echo "Res:${res}"
-#echo "Res:${res}" >> $logFile 2>&1
-#echo "logFile:$logFile"
 
 gcc --version >> $logFile 2>&1
 
@@ -175,7 +168,7 @@ additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.i
 for plugin in ${additionalPlugins[*]}
 do 
     upperPlugin=${plugin^^} 
-    #echo $upperPlugin
+
     case $upperPlugin in
         
         PYTHON2*)   if [[ -z $GLOBAL_EXCLUSION  ]]
@@ -224,16 +217,6 @@ cd ${PR_ROOT}
 
 #-------------------------------------------------
 #
-# Update submodule
-#cd $SOURCE_ROOT
-
-#echo "Update Git submodules"
-#echo "Update Git submodules" >> $logFile 2>&1
-
-#git submodule update --init --recursive
-
-#-------------------------------------------------
-#
 # Patch system/jlib/jthread.hpp to build in c++11 
 #
 echo 'Patch system/jlib/jthread.hpp to build in c++11 '
@@ -253,9 +236,6 @@ cd $PR_ROOT
 cd ${BUILD_ROOT}
 
 WritePlainLog "Create makefiles $(date +%Y-%m-%d_%H-%M-%S)" "$logFile"
-#cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
-#cmake  -G"Eclipse CDT4 - Unix Makefiles" -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 -DSUPPRESS_PY3EMBED=ON -DINCLUDE_PY3EMBED=OFF -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
-#CM_CMD="cmake -DRUNTIME_USER=$RUNTIME_USER -DDESTDIR=${PR_ROOT}/$TARGET_DIR -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 ${PYTHON_PLUGIN} -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -DECLWATCH_BUILD_STRATEGY=$ECLWATCH_BUILD_STRATEGY -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform"
 
 GENERATOR="Eclipse CDT4 - Unix Makefiles"
 CMAKE_CMD=$'cmake -G "'${GENERATOR}$'"'
@@ -277,22 +257,6 @@ CMAKE_CMD+=$' -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC
 WritePlainLog "CMAKE_CMD:'${CMAKE_CMD}'\\n" "$logFile"
 
 eval ${CMAKE_CMD} >> $logFile 2>&1
-
-# -- Current release version is hpccsystems-platform_community-5.1.0-trunk0Debugquantal_amd64
-# In quick build method we have not package
-
-#hpccpackage="hpccsystems-platform_community-4.1.0-trunk1Debugquantal_amd64.deb"
-#hpccpackage="hpccsystems-platform*"
-#rm -f $hpccpackage
-#if [ $? -ne 0 ]
-#then
-#    echo "To remove ${hpccpackage} is failed"
-#    echo "To remove ${hpccpackage} is failed" >> $logFile 2>&1
-#else
-#    echo "To remove ${hpccpackage} success"
-#    echo "To remove ${hpccpackage} success" >> $logFile 2>&1
-#fi
-
 
 #
 # ------------------------------------------------
@@ -327,28 +291,24 @@ fi
 
 PREP_TIME=$(( $(date +%s) - $TIME_STAMP ))
 WritePlainLog "Makefiles created ($(date +%Y-%m-%d_%H-%M-%S) $PREP_TIME sec )" "$logFile"
+
 #
 #----------------------------------------------------
 # Build HPCC
 # 
 WriteMilestone "Build it" "$logFile"
-#WritePlainLog "Build it" "$logFile"
 
 BUILD_SUCCESS=true
-#make -j 16 -d package >> $logFile 2>&1
 CMD="make -j ${NUMBER_OF_BUILD_THREADS}"
 
 
 WritePlainLog "cmd: ${CMD}  ($(date +%Y-%m-%d_%H-%M-%S))" "$logFile"
 TIME_STAMP=$(date +%s)
-#${CMD} 2>&1 | tee -a $logFile
 ${CMD} >> $logFile 2>&1
  
-
 if [ $? -ne 0 ]
 then
     WritePlainLog "res: $res" "$logFile"
-    #cat $logFile
     WritePlainLog "Build failed" > ../build.summary
     CheckResult "$logFile"
     exit 1
@@ -361,44 +321,10 @@ CheckEclWatchBuildResult "$logFile"
 BUILD_TIME=$(( $(date +%s) - $TIME_STAMP ))
 WritePlainLog "Build and Install finished ($( date +%Y-%m-%d_%H-%M-%S ) $BUILD_TIME sec)" "$logFile"
 
-# # In quick build method we do not make package
-#CMD="make -j ${NUMBER_OF_BUILD_THREADS} package"
-#
-#echo "cmd: ${CMD} $(date +%Y-%m-%d_%H-%M-%S)"
-#echo "cmd: ${CMD} $(date +%Y-%m-%d_%H-%M-%S)" >> $logFile 2>&1
-#
-#${CMD} >> $logFile 2>&1
-#
-#
-#echo "End $(date +%Y-%m-%d_%H-%M-%S)"
-#echo "End $(date +%Y-%m-%d_%H-%M-%S)" >> $logFile 2>&1
-
-#IS_NOT_RPM=$( type "rpm" 2>&1 | grep -c "not found" )
-#echo "IS_NOT_RPM: $IS_NOT_RPM"
-#PKG_EXT=
-#INST_CMD=
-#
-#if [[ "$IS_NOT_RPM" -ne 0 ]]
-#then
-#    PKG_EXT=".deb"
-#    INST_CMD="dpkg -i "
-#else
-#    PKG_EXT=".rpm"
-#    INST_CMD="rpm -i --nodeps "
-#fi
-#echo "packageExt: '$PKG_EXT', installCMD: '$INST_CMD'."
-#
-##hpccpackage=$( grep 'Current release version' ${logFile} | cut -c 31- )".deb"
-#hpccpackage=$( grep 'Current release version' ${logFile} | cut -c 31- )${PKG_EXT}
-#
-#echo "HPCC package: ${hpccpackage}"
-#echo "HPCC package: ${hpccpackage}" >> $logFile 2>&1
-
 WritePlainLog "Check the build result" "$logFile"
 if [ ${BUILD_SUCCESS} ]
 then
     echo "Build: success"
-    #echo "Build: success" >> $logFile 2>&1
     echo "Build: success" > ../build.summary
 
     if [[ "$ECLWATCH_BUILD_STRATEGY" != "SKIP" ]]
@@ -454,7 +380,6 @@ then
         # If the result is "Service dafilesrv, mydafilesrv is still running."
         if [[ $res -ne 0 ]]
         then
-            #echo $res
             WritePlainLog "res: $res" "$logFile"
             $TARGET_DIR/etc/init.d/dafilesrv stop >> $logFile 2>&1
         fi
@@ -474,7 +399,7 @@ then
     fi
     
     WriteMilestone "Start HPCC system with $NUMBER_OF_HPCC_COMPONENTS components" "$logFile"
-    #WritePlainLog "Let's start HPCC system" "$logFile"
+
     hpccStart=$( $TARGET_DIR/etc/init.d/hpcc-init start 2>&1 )
     hpccStatus=$( $TARGET_DIR/etc/init.d/hpcc-init status 2>&1 )
     hpccRunning=$( $TARGET_DIR/etc/init.d/hpcc-init status | grep -c "running" )
@@ -526,7 +451,6 @@ then
             cmd="./unittest.sh"
             WriteMilestone "Unittests" "$logFile"
             WritePlainLog "cmd: ${cmd}" "$logFile"
-            #${cmd} 2>&1 | tee -a $logFile
             ${cmd} >> $logFile 2>&1
             
             popd
@@ -541,7 +465,6 @@ then
             cmd="./wutoolTest.sh"
             WriteMilestone "WUTooltest" "$logFile"
             WritePlainLog "cmd: ${cmd}" "$logFile"
-            #${cmd} 2>&1  | tee -a $logFile
             ${cmd} >> $logFile 2>&1
             
             popd
@@ -549,14 +472,10 @@ then
         
         if [ -n "$REGRESSION_TEST" ]
         then
-        
             PATH=$PATH:$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/bin:$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/sbin
             
             WritePlainLog "pushd ${PR_ROOT}" "$logFile"
             pushd ${TEST_DIR}
-            #pwd2=$(PR_ROOT )
-            #echo "pwd:${pwd2}"
-            #echo "pwd:${pwd2}" >> $logFile 2>&1
 
             # Patch ecl-test.json to put log inside the smoketest-xxxx directory
             # TO-DO same with donload directory
@@ -610,7 +529,7 @@ then
                     fi
                 
                     WritePlainLog "cmd: ${cmd}" "$logFile"
-                    #${cmd} 2>&1  | tee -a $logFile
+
                     ${cmd} >> $logFile 2>&1 
                     retVal=$?
                     
@@ -628,8 +547,7 @@ then
                     fi
                 fi
             fi
-            #setupPassed=0
-            #WritePlainLog "Setup failed." "$logFile"
+
             inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" )
             if [ -n "${inSuiteErrorLog}" ]
             then
@@ -697,7 +615,6 @@ then
 
     WritePlainLog "Check core files in $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/." "$logFile"
 
-    #cores=($(find $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/ -name 'core*' -type f))
     cores=( $(find $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/ -name 'core*' -type f -exec printf "%s\n" '{}' \; ) )
     
     if [ ${#cores[@]} -ne 0 ]
@@ -722,9 +639,7 @@ then
             WritePlainLog "Add $core (${coreSize} bytes) to archive" "$logFile"
 
             WritePlainLog "Generate backtrace for $core." "$logFile"
-            #base=$( dirname $core )
-            #lastSubdir=${base##*/}
-            #comp=${lastSubdir##my}
+
             corename=${core##*/}; 
             comp=$( echo $corename | tr '_.' ' ' | awk '{print $2 }' ); 
             compnamepart=$( find hpcc/opt/HPCCSystems/bin/ -iname "$comp*" -type f -print); 
@@ -732,14 +647,12 @@ then
             WritePlainLog "corename: ${corename}, comp: ${comp}, compnamepart: ${compnamepart}, component name: ${compname}" "$logFile"
             components+=compname
             gdb --batch --quiet -ex "set interactive-mode off" -ex "echo \nBacktrace for all threads\n==========================" -ex "thread apply all bt" -ex "echo \n Registers:\n==========================\n" -ex "info reg" -ex "echo \n Disas:\n==========================\n" -ex "disas" -ex "quit" "$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/bin/${compname}" $core > $core.trace 2>&1
-
-            #sudo zip ${HPCC_CORE_ARCHIVE} $c >> ${HPCC_CORE_ARCHIVE}.log
         done
 
         # Add core files to ZIP
         for core in ${cores[@]:0:$numberOfCoresTobeArchive}; do echo $core; done | zip ${HPCC_CORE_ARCHIVE} -@ >> ${HPCC_CORE_ARCHIVE}.log
         
-        # Addd binaries
+        # Add binaries
         for comp in ${componenets[@]}; do echo "$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/bin/${comp}"; done | zip ${HPCC_CORE_ARCHIVE} -@ >> ${HPCC_CORE_ARCHIVE}.log
         
         # Add trace files to ZIP
@@ -752,10 +665,6 @@ then
 
     else
         WritePlainLog "There is no core file in /var/lib/HPCCSystems/" "$logFile"
-
-        #echo "There is no core file in /var/lib/HPCCSystems/" >> ${HPCC_CORE_ARCHIVE}.log
-        #echo "-----------------------------------------------------------" >> ${HPCC_CORE_ARCHIVE}.log
-        #echo " " >>${HPCC_CORE_ARCHIVE}.log
     fi
 
     WritePlainLog "Store trace file(s) from ${TEST_LOG_DIR} into the relatted ZAP file " "$logFile"
@@ -769,38 +678,10 @@ then
 
     popd
     WritePlainLog "Done." "$logFile"
-    
-    # Only for debug purpose
-    #zip ${HPCC_LOG_ARCHIVE} -r ${PR_ROOT}/${TARGET_DIR}/var/lib/HPCCSystems/myeclagent/temp/* >> $logFile 2>&1
 
     zip ${HPCC_LOG_ARCHIVE} ${PR_ROOT}/build/esp/src/eclwatch_build_*.txt >> $logFile 2>&1
     zip ${HPCC_LOG_ARCHIVE} -r ${PR_ROOT}/build/esp/src/build/*.txt >> $logFile 2>&1
 
-    # We are not install packageso don't need to uninstall
-#    if [ -f $TARGET_DIR/opt/HPCCSystems/sbin/complete-uninstall.sh ]
-#    then
-#        sudo /opt/HPCCSystems/sbin/complete-uninstall.sh 
-#        echo "HPCC Uninstall: OK"
-#        echo "HPCC Uninstall: OK" >> $logFile 2>&1
-#        if [ -f "/etc/HPCCSystems/environment.xml" ]
-#        then
-#            echo "Remove environment.conf and .xml"
-#            echo "Remove environment.conf and .xml" >> $logFile 2>&1
-#            sudo rm -f '/etc/HPCCSystems/environment.*'
-#            
-#            if [ -f "/etc/HPCCSystems/environment.xml" ]
-#            then
-#                echo "  Failed."
-#                echo "  Failed." >> $logFile 2>&1
-#            else
-#                echo "  Success."
-#                echo "  Success." >> $logFile 2>&1
-#            fi
-#        fi
-#    else
-#        echo "HPCC Uninstall: failed"
-#        echo "HPCC Uninstall: failed" >> $logFile 2>&1
-#    fi
     # However we need to stop HPCC
     hpccRunning=$( $TARGET_DIR/etc/init.d/hpcc-init status | grep -c "running")
     WritePlainLog "Local $hpccRunning running components" "$logFile"

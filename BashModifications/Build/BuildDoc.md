@@ -1,5 +1,8 @@
 ##Removed Commented Code
 
+Lines 11-12: "#BUILD_TYPE=Debug
+              #COMMON_RTE_DIR=$( dirname $PR_ROOT)/rte"
+
 Lines 39-40: "#HTHOR_PQ=$(( $NUMBER_OF_CPUS / 4  + (($RANDOM %  3) - 1 ) ))  # 1, 2 or 3
     #HTHOR_PQ=$(( $NUMBER_OF_CPUS / 4  + ( $RANDOM %  2 ) ))  #  2 or 3"
     

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Run in a console: 
 #  while true; do clear; date "+%Y-%m-%d %H:%M:%S" ; ./showSchedulerStatus.sh ; sleep 15; done
 

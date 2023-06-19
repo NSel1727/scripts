@@ -53,7 +53,7 @@ then
     echo "Tested PRs on ${day}:"
     cat prp-${day}.log |  grep -E  '^([0-9]*)/([0-9]*)\. Process|wait|^(\s*)sha|^(\s*)base|^(\s*)user|HPCC Start|^(\s*)start|^(\s*)end|^(\s*)pass|scheduled|done, exit' | grep -E -i -B7 'pass : (True|False)' | grep -E 'PR-|pass :' | sed -n 's/^\(.*\)\s\(PR-[0-9].*\),\(.*\)$/    \2/p' | sort -u
 else
-    echo "We have not log file for ${day}. Try it in the log achive."
+    echo "We have no log file for ${day}. Try it in the log achive."
 fi
 
 echo "End of $0."

@@ -5,7 +5,7 @@ PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 usage ()
 {
-    echo "Tool to list Executed Smoketest session(s) on a current or give date"
+    echo "Tool to list Executed Smoketest session(s) on a current or given date"
     echo "Usage:"
     echo ""
     echo "./listTests/sh [yy-mm-dd] [-rte] [-v] [-h]"
@@ -90,10 +90,8 @@ do
     [[ -z "$item" ]] && ( item=$( cat $fn | grep -E -i 'Instancename: |CommitId: |:Instance Id|An error' | cut -d' ' -f4,6 | tr -d \' | sed 's/commitId=//' | paste -d, -s - | cut -d',' -f1,2,3 --output ', ' ); version=2 )
     [[ -z "$item" ]] && ( item=$( cat $fn | grep -E -i 'Schedule |sha ' | cut -d ' ' -f1,2,3,4,5 | tr -d \' | tr -d ':' | tr -s ' \t' | paste -d, -s -  ); version=2 )
     
-
     timestamp=$( head -n 1 $fn |  cut -d: -f1,2,3 )
 
-    
     IFS=',' read -ra arr <<< "$item"
 
     unset -v IFS # restore IFS to default
