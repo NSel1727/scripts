@@ -65,7 +65,6 @@ then
     DALI_STOPPED=$( $SUDO ${HPCC_INIT_PATH}/hpcc-init -c dali status | grep -c '[s]topped' )
     if [[  ${DALI_STOPPED} -eq 1 ]]
     then
-
         WriteLog "Dali stopped, start it." "$WUTOOLTEST_EXECUTION_LOG_FILE"
         DALI_STARTED=$( $SUDO ${HPCC_INIT_PATH}/hpcc-init -c dali start | grep -c '[O]K' )
         if [[ ${DALI_STARTED} -eq 1 ]]
@@ -87,8 +86,6 @@ fi
 #
 
 WriteLog "Check Cassandra..." "$WUTOOLTEST_EXECUTION_LOG_FILE"
-
-
 
 tryCount=0   # DO NOT TRY TO START CASSANDRA (based on log4j problem)
 testCassandra=0
@@ -160,7 +157,6 @@ then
         WriteLog "Cassandra didn't start with 'sudo systemctl enable cassandra'." "${WUTOOLTEST_EXECUTION_LOG_FILE}"
     fi
 fi
-
 
 #
 #-------------------------------
@@ -250,9 +246,6 @@ cp $WUTOOLTEST_RESULT_FILE $WUTOOLTEST_LAST_RESULT_FILE
 # Proccess result
 #
 
-
-
-
 if [[ -f ${WUTOOLTEST_SUMMARY_FILE} ]]
 then
     WriteLog "Remove ${WUTOOLTEST_SUMMARY_FILE}." "$WUTOOLTEST_EXECUTION_LOG_FILE"
@@ -271,7 +264,6 @@ elaps=''
 IFS=$'\n'
 results=($( cat ${WUTOOLTEST_LAST_RESULT_FILE} | grep -E  'OK|Run:|target:|test:|assertion|expression|Error|Elaps' ))
 for res in ${results[@]}
-
 do
     echo "Res: '${res}'"
     IS_TARGET=$( echo $res | grep -i -c 'target' )
@@ -322,7 +314,6 @@ do
             fi
             UNIT_PASSED="$(( $UNIT_TOTAL - $UNIT_FAILED - $UNIT_ERRORS - $UNIT_TIMEOUT))"
 
-
             TOTAL=$(( $TOTAL + $UNIT_TOTAL))
             PASSED=$(( $PASSED + $UNIT_PASSED))
             FAILED=$(( $FAILED + $UNIT_FAILED))
@@ -334,8 +325,6 @@ do
             continue
         fi
     fi
-
-
 done
 
 TEST_TIME=$(( $(date +%s) - $TIME_STAMP ))
@@ -374,7 +363,6 @@ then
     sudo rm -r /var/log/cassandra
     
 fi
-
 
 wdPid=$( cat ./WatchDog.pid )
 WriteLog "Kill WatchDog (${wdPid})." "$WUTOOLTEST_EXECUTION_LOG_FILE"
@@ -430,7 +418,6 @@ then
 else
     WriteLog "No core file generated." "$WUTOOLTEST_EXECUTION_LOG_FILE"
 fi
-
 
 WriteLog "End." "$WUTOOLTEST_EXECUTION_LOG_FILE"
 
