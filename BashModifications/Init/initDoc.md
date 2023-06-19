@@ -49,4 +49,12 @@ Lines 565-567: "# Don't use Public IP, out network may refuse to connect to it
 				#sed -e 's/origin=\(ec2.*\)/origin='"$PUBLIC_IP"':5006/g' ./startBokeh_templ.sh>  ./startBokeh.sh
 				#myEcho "Bokeh address: $PUBLIC_IP:5006""
 				
+##Other Changes
+
+egrep -> grep -E
+
+Line 35 Removed: 
+```
+AVERAGE_SESSION_TIME=0.75 # Hours for m4.4xlarge instance
+```
 

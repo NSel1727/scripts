@@ -13,7 +13,6 @@ DOCS_BUILD=0
 DOCS_BUILD_STR=''
 KEEP_FILES=0
 DRY_RUN=0
-AVERAGE_SESSION_TIME=0.75 # Hours for m4.4xlarge instance
 AVERAGE_SESSION_TIME=1.2 # Hours for m4.2xlarge instance
 BASE_TEST=0
 BASE_TAG=''
