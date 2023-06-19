@@ -250,8 +250,8 @@ cp $WUTOOLTEST_RESULT_FILE $WUTOOLTEST_LAST_RESULT_FILE
 # Proccess result
 #
 
-#For test the result processing
-#WUTOOLTEST_RESULT_FILE=${OBT_LOG_DIR}/wutoolTest-result-2016-04-15_12-52-58.log
+
+
 
 if [[ -f ${WUTOOLTEST_SUMMARY_FILE} ]]
 then
@@ -271,7 +271,7 @@ elaps=''
 IFS=$'\n'
 results=($( cat ${WUTOOLTEST_LAST_RESULT_FILE} | grep -E  'OK|Run:|target:|test:|assertion|expression|Error|Elaps' ))
 for res in ${results[@]}
-#cat ${WUTOOLTEST_RESULT_FILE} | egrep -i 'ok|Run:' | while read res
+
 do
     echo "Res: '${res}'"
     IS_TARGET=$( echo $res | grep -i -c 'target' )
@@ -295,7 +295,7 @@ do
     if [[ $IS_PASS -eq 1 ]]
     then
         RESULT=$(echo $res | grep 'OK (' )
-        #WriteLog "Result: ${RESULT}" "$WUTOOLTEST_EXECUTION_LOG_FILE"
+
         UNIT_TOTAL=$(echo "${RESULT}" | sed -n "s/^[[:space:]]*OK[[:space:]]*(\([0-9]*\)\(.*\)$/\1/p" )
         UNIT_PASSED=$UNIT_TOTAL
         UNIT_FAILED=0
@@ -303,7 +303,7 @@ do
         UNIT_TIMEOUT=0
         TOTAL=$(( $TOTAL + $UNIT_TOTAL))
         PASSED=$(( $PASSED + $UNIT_PASSED))
-        #FAILED=$(( $FAILED + $UNIT_FAILED))   
+
     else
         RESULT=$( echo $res | grep -i 'Run:' )
         if [[ "$RESULT" != "" ]]
@@ -321,8 +321,8 @@ do
                 UNIT_TIMEOUT=0
             fi
             UNIT_PASSED="$(( $UNIT_TOTAL - $UNIT_FAILED - $UNIT_ERRORS - $UNIT_TIMEOUT))"
-            #WriteLog "TestResult:unit:total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:{$UNIT_ERRORS} timeout:${UNIT_TIMEOUT}"  "$WUTOOLTEST_EXECUTION_LOG_FILE"
-            #echo "TestResult:wutoolTest:total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:{$UNIT_ERRORS} timeout:${UNIT_TIMEOUT}" > $WUTOOLTEST_SUMMARY_FILE
+
+
             TOTAL=$(( $TOTAL + $UNIT_TOTAL))
             PASSED=$(( $PASSED + $UNIT_PASSED))
             FAILED=$(( $FAILED + $UNIT_FAILED))
@@ -334,14 +334,14 @@ do
             continue
         fi
     fi
-    #WriteLog "TestResult:wutoolTest(${target}):total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:${UNIT_ERRORS} timeout:${UNIT_TIMEOUT} elaps:${elaps}"  "$WUTOOLTEST_EXECUTION_LOG_FILE"    
-    #echo "TestResult:wutoolTest(${target}):total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:${UNIT_ERRORS} timeout:${UNIT_TIMEOUT} elaps:${elaps}" >> $WUTOOLTEST_SUMMARY_FILE    
+
+
 done
 
 TEST_TIME=$(( $(date +%s) - $TIME_STAMP ))
 
 WriteLog "TestResult:wutoolTest:total:${TOTAL} passed:${PASSED} failed:${FAILED} errors:${ERRORS} timeout:${TIMEOUT} elaps:${TEST_TIME}"  "$WUTOOLTEST_EXECUTION_LOG_FILE"    
-#echo "TestResult:wutoolTest:total:${TOTAL} passed:${PASSED} failed:${FAILED} errors:${ERRORS} timeout:${TIMEOUT}" > $WUTOOLTEST_SUMMARY_FILE
+
 WriteLog "${summary_log}" "$WUTOOLTEST_EXECUTION_LOG_FILE"
 echo -e "${summary_log}" >> $WUTOOLTEST_SUMMARY_FILE
 #set +x
