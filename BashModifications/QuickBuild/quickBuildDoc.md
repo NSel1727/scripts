@@ -135,4 +135,13 @@ Lines 780-803: "#if [ -f $TARGET_DIR/opt/HPCCSystems/sbin/complete-uninstall.sh 
 Lines 819-820: "# give it some time
                 #sleep 5"
                 
+##Other Changes
 
+MyEcho removed due to no usage.
+```
+MyEcho ()
+{
+    param=$1
+    WritePlainLog "${param}" "$resultFile"
+}
+```

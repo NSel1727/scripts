@@ -52,13 +52,6 @@ cleanUpLeftovers "$logFile"
 
 gcc --version >> $logFile 2>&1
 
-
-MyEcho ()
-{
-    param=$1
-    WritePlainLog "${param}" "$resultFile"
-}
-
 BUILD_ROOT=build
 if [ ! -d ${BUILD_ROOT} ]
 then
