@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 LOG_DIR=$(pwd)
 LONG_DATE=$(date "+%Y-%m-%d_%H-%M-%S")
 DISK_SPACE_LOG_FILE=${LOG_DIR}/diskspace-${LONG_DATE}.log
@@ -28,14 +27,14 @@ ControlC()
 WriteHeaders()
 {
     # Print disk space header
-    header1=$(df -h . | egrep "^(Filesystem)" | tr '\n' ' ')
-    header2=$(df -hP . | egrep "^(Filesystem)" | tr '\n' ' ')
+    header1=$(df -h . | grep -E "^(Filesystem)" | tr '\n' ' ')
+    header2=$(df -hP . | grep -E "^(Filesystem)" | tr '\n' ' ')
     header="${header1}    ${header2}"
 
     WriteLog "${header}" "${DISK_SPACE_LOG_FILE}"
 
     # Print memory space header
-    header=$(free | egrep "^(\s)" | tr '\n' ' ')
+    header=$(free | grep -E "^(\s)" | tr '\n' ' ')
     WriteLog "${header}" "${MEM_SPACE_LOG_FILE}"
 }
 #
@@ -53,31 +52,19 @@ trap ControlC SIGKILL
 
 WriteHeaders
 
-#lineCount=0
-
 while true
 do 
-    #if [[ ${lineCount} -eq 0 ]]
-    #then
-    #    WriteHeaders
-    #fi
 
-    #lineCount=$(( ${lineCount} + 1))
-    #if [[ ${lineCount} -eq ${HEADER_ON_EVERY_LINES} ]]
-    #then
-    #    #lineCount=0
-    #fi  
-
-    myDs1=$(df -lh  . | egrep "^(/dev/)" | tr '\n' ' ')
+    myDs1=$(df -lh  . | grep -E "^(/dev/)" | tr '\n' ' ')
 
     # On our testfarm /var/lib located on other partition/disk
-    myDs2=$(df -Ph  /var/lib | egrep "^(/dev/)" | tr '\n' ' ')
+    myDs2=$(df -Ph  /var/lib | grep -E "^(/dev/)" | tr '\n' ' ')
 
     myDs="${myDs1}    ${myDs2}"
 
     WriteLog "${myDs}" "${DISK_SPACE_LOG_FILE}"
  
-    myMem=$( free | egrep "^(Mem|Swap)" | tr '\n' ' ')
+    myMem=$( free | grep -E "^(Mem|Swap)" | tr '\n' ' ')
     WriteLog "${myMem}" "${MEM_SPACE_LOG_FILE}"
 
     sleep ${DELAY}

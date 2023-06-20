@@ -1,5 +1,7 @@
 ##Comment Removals
 
+Line 137: "#INSTANCE_NAME=${INSTANCE_NAME//PR/PR-}"
+
 Lines 170-172: "#BASE_TAG=${param//baseTest=/}
 				#BASE_TAG=${BASE_TAG//\"/}
 				#WriteLog "Execute base test with tag: ${BASE_TAG}" "$LOG_FILE"

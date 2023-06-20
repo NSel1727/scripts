@@ -25,13 +25,13 @@ WUTOOLTEST_RESULT_FILE=${OBT_LOG_DIR}/wutoolTests.$(date "+%Y-%m-%d_%H-%M-%S").l
 WUTOOLTEST_LAST_RESULT_FILE=${OBT_LOG_DIR}/wutoolTests.log
 WUTOOLTEST_SUMMARY_FILE=${OBT_LOG_DIR}/wutoolTests.summary
 WUTOOLTEST_BIN=/opt/HPCCSystems/bin/wutool
-#WUTOOLTEST_EXCLUSION='CcdFileTest'
+
 WUTOOLTEST_EXCLUSION=
 testTargets=( "Dali" "Cassandra" )
 testParams=( "DALISERVER=." )
 SUDO=
 
-START_DISK_SPACE_CHECKER=$( env | egrep -c 'START_DISK_SPACE_CHECKER' )
+START_DISK_SPACE_CHECKER=$( env | grep -E -c 'START_DISK_SPACE_CHECKER' )
 
 #
 #-------------------------------
@@ -65,7 +65,6 @@ then
     DALI_STOPPED=$( $SUDO ${HPCC_INIT_PATH}/hpcc-init -c dali status | grep -c '[s]topped' )
     if [[  ${DALI_STOPPED} -eq 1 ]]
     then
-
         WriteLog "Dali stopped, start it." "$WUTOOLTEST_EXECUTION_LOG_FILE"
         DALI_STARTED=$( $SUDO ${HPCC_INIT_PATH}/hpcc-init -c dali start | grep -c '[O]K' )
         if [[ ${DALI_STARTED} -eq 1 ]]
@@ -87,8 +86,6 @@ fi
 #
 
 WriteLog "Check Cassandra..." "$WUTOOLTEST_EXECUTION_LOG_FILE"
-
-#sudo rm -rf /var/lib/cassandra/*
 
 tryCount=0   # DO NOT TRY TO START CASSANDRA (based on log4j problem)
 testCassandra=0
@@ -126,8 +123,8 @@ then
         else
             WriteLog "It is OK!" "${WUTOOLTEST_EXECUTION_LOG_FILE}"
             testCassandra=1
-            # Wait for 10 sec to Cassandra wake up
-            #sleep 10
+
+
             break
         fi
     done
@@ -151,7 +148,7 @@ then
     sudo systemctl enable cassandra
     sleep 10
     WriteLog "$(nodetool status)" "${WUTOOLTEST_EXECUTION_LOG_FILE}"
-    testCassandra=$( nodetool status | egrep -c '^UN' )
+    testCassandra=$( nodetool status | grep -E -c '^UN' )
     if [[ $testCassandra -eq 1 ]]
     then
         WriteLog "Cassandra seems OK!" "${WUTOOLTEST_EXECUTION_LOG_FILE}"
@@ -160,7 +157,6 @@ then
         WriteLog "Cassandra didn't start with 'sudo systemctl enable cassandra'." "${WUTOOLTEST_EXECUTION_LOG_FILE}"
     fi
 fi
-
 
 #
 #-------------------------------
@@ -218,7 +214,7 @@ do
     WriteLog "cmd:${cmd}" "$WUTOOLTEST_EXECUTION_LOG_FILE"
     echo "target:${testTargets[$index]}" >> $WUTOOLTEST_RESULT_FILE
     result=$( ${cmd} 2>&1 )
-    IS_NOT_TIMEOUT=$( echo "$result" | egrep -ic "ok |run|timing|terminate")
+    IS_NOT_TIMEOUT=$( echo "$result" | grep -E -ic "ok |run|timing|terminate")
     WriteLog "IS_NOT_TIMEOUT: ${IS_NOT_TIMEOUT}" "$WUTOOLTEST_EXECUTION_LOG_FILE"
     if [[ $IS_NOT_TIMEOUT -ge 1 ]]
     then
@@ -250,9 +246,6 @@ cp $WUTOOLTEST_RESULT_FILE $WUTOOLTEST_LAST_RESULT_FILE
 # Proccess result
 #
 
-#For test the result processing
-#WUTOOLTEST_RESULT_FILE=${OBT_LOG_DIR}/wutoolTest-result-2016-04-15_12-52-58.log
-
 if [[ -f ${WUTOOLTEST_SUMMARY_FILE} ]]
 then
     WriteLog "Remove ${WUTOOLTEST_SUMMARY_FILE}." "$WUTOOLTEST_EXECUTION_LOG_FILE"
@@ -269,9 +262,8 @@ summary_log=''
 target=''
 elaps=''
 IFS=$'\n'
-results=($( cat ${WUTOOLTEST_LAST_RESULT_FILE} | egrep  'OK|Run:|target:|test:|assertion|expression|Error|Elaps' ))
+results=($( cat ${WUTOOLTEST_LAST_RESULT_FILE} | grep -E  'OK|Run:|target:|test:|assertion|expression|Error|Elaps' ))
 for res in ${results[@]}
-#cat ${WUTOOLTEST_RESULT_FILE} | egrep -i 'ok|Run:' | while read res
 do
     echo "Res: '${res}'"
     IS_TARGET=$( echo $res | grep -i -c 'target' )
@@ -295,7 +287,7 @@ do
     if [[ $IS_PASS -eq 1 ]]
     then
         RESULT=$(echo $res | grep 'OK (' )
-        #WriteLog "Result: ${RESULT}" "$WUTOOLTEST_EXECUTION_LOG_FILE"
+
         UNIT_TOTAL=$(echo "${RESULT}" | sed -n "s/^[[:space:]]*OK[[:space:]]*(\([0-9]*\)\(.*\)$/\1/p" )
         UNIT_PASSED=$UNIT_TOTAL
         UNIT_FAILED=0
@@ -303,7 +295,7 @@ do
         UNIT_TIMEOUT=0
         TOTAL=$(( $TOTAL + $UNIT_TOTAL))
         PASSED=$(( $PASSED + $UNIT_PASSED))
-        #FAILED=$(( $FAILED + $UNIT_FAILED))   
+
     else
         RESULT=$( echo $res | grep -i 'Run:' )
         if [[ "$RESULT" != "" ]]
@@ -321,8 +313,7 @@ do
                 UNIT_TIMEOUT=0
             fi
             UNIT_PASSED="$(( $UNIT_TOTAL - $UNIT_FAILED - $UNIT_ERRORS - $UNIT_TIMEOUT))"
-            #WriteLog "TestResult:unit:total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:{$UNIT_ERRORS} timeout:${UNIT_TIMEOUT}"  "$WUTOOLTEST_EXECUTION_LOG_FILE"
-            #echo "TestResult:wutoolTest:total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:{$UNIT_ERRORS} timeout:${UNIT_TIMEOUT}" > $WUTOOLTEST_SUMMARY_FILE
+
             TOTAL=$(( $TOTAL + $UNIT_TOTAL))
             PASSED=$(( $PASSED + $UNIT_PASSED))
             FAILED=$(( $FAILED + $UNIT_FAILED))
@@ -334,14 +325,12 @@ do
             continue
         fi
     fi
-    #WriteLog "TestResult:wutoolTest(${target}):total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:${UNIT_ERRORS} timeout:${UNIT_TIMEOUT} elaps:${elaps}"  "$WUTOOLTEST_EXECUTION_LOG_FILE"    
-    #echo "TestResult:wutoolTest(${target}):total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:${UNIT_ERRORS} timeout:${UNIT_TIMEOUT} elaps:${elaps}" >> $WUTOOLTEST_SUMMARY_FILE    
 done
 
 TEST_TIME=$(( $(date +%s) - $TIME_STAMP ))
 
 WriteLog "TestResult:wutoolTest:total:${TOTAL} passed:${PASSED} failed:${FAILED} errors:${ERRORS} timeout:${TIMEOUT} elaps:${TEST_TIME}"  "$WUTOOLTEST_EXECUTION_LOG_FILE"    
-#echo "TestResult:wutoolTest:total:${TOTAL} passed:${PASSED} failed:${FAILED} errors:${ERRORS} timeout:${TIMEOUT}" > $WUTOOLTEST_SUMMARY_FILE
+
 WriteLog "${summary_log}" "$WUTOOLTEST_EXECUTION_LOG_FILE"
 echo -e "${summary_log}" >> $WUTOOLTEST_SUMMARY_FILE
 #set +x
@@ -374,7 +363,6 @@ then
     sudo rm -r /var/log/cassandra
     
 fi
-
 
 wdPid=$( cat ./WatchDog.pid )
 WriteLog "Kill WatchDog (${wdPid})." "$WUTOOLTEST_EXECUTION_LOG_FILE"
@@ -430,7 +418,6 @@ then
 else
     WriteLog "No core file generated." "$WUTOOLTEST_EXECUTION_LOG_FILE"
 fi
-
 
 WriteLog "End." "$WUTOOLTEST_EXECUTION_LOG_FILE"
 

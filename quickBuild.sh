@@ -9,7 +9,6 @@ PR_ROOT=${pwd}
 PR_ROOT_ESCAPED=${PR_ROOT//\//\\/}
 SOURCE_ROOT=${PR_ROOT}/HPCC-Platform
 BUILD_TYPE=RelWithDebInfo
-#BUILD_TYPE=Debug
 TEST_DIR=${SOURCE_ROOT}/testing/regress
 ESP_TEST_DIR=${SOURCE_ROOT}/testing/esp/wudetails
 TARGET_DIR=hpcc
@@ -53,13 +52,6 @@ cleanUpLeftovers "$logFile"
 
 gcc --version >> $logFile 2>&1
 
-#Intern TODO: This function is never called, determine if needed
-MyEcho ()
-{
-    param=$1
-    WritePlainLog "${param}" "$resultFile"
-}
-
 BUILD_ROOT=build
 if [ ! -d ${BUILD_ROOT} ]
 then
@@ -89,6 +81,7 @@ rm -f ${BUILD_ROOT}/CMakeCache.txt
 WritePlainLog "Start..." "$logFile"
 WritePlainLog "PR_ROOT:$PR_ROOT" "$logFile"
 WritePlainLog "Build type: ${BUILD_TYPE}" "$logFile"
+
 WritePlainLog "Stored params: ${STORED_PARAMS}" "$logFile"
 
 echo "$0 CLI params are: $@"
@@ -291,28 +284,24 @@ fi
 
 PREP_TIME=$(( $(date +%s) - $TIME_STAMP ))
 WritePlainLog "Makefiles created ($(date +%Y-%m-%d_%H-%M-%S) $PREP_TIME sec )" "$logFile"
+
 #
 #----------------------------------------------------
 # Build HPCC
 # 
 WriteMilestone "Build it" "$logFile"
 
-
 BUILD_SUCCESS=true
-
 CMD="make -j ${NUMBER_OF_BUILD_THREADS}"
 
 
 WritePlainLog "cmd: ${CMD}  ($(date +%Y-%m-%d_%H-%M-%S))" "$logFile"
 TIME_STAMP=$(date +%s)
-
 ${CMD} >> $logFile 2>&1
  
-
 if [ $? -ne 0 ]
 then
     WritePlainLog "res: $res" "$logFile"
-
     WritePlainLog "Build failed" > ../build.summary
     CheckResult "$logFile"
     exit 1
@@ -329,7 +318,6 @@ WritePlainLog "Check the build result" "$logFile"
 if [ ${BUILD_SUCCESS} ]
 then
     echo "Build: success"
-
     echo "Build: success" > ../build.summary
 
     if [[ "$ECLWATCH_BUILD_STRATEGY" != "SKIP" ]]
@@ -381,12 +369,10 @@ then
     hpccRunning=$( $TARGET_DIR/etc/init.d/hpcc-init status  | grep -c "running")
     if [[ "$hpccRunning" -ne 0 ]]
     then
-        #INTERN TODO: Maybe make this a function since this sequence is used multiple times
         res=$($TARGET_DIR/etc/init.d/hpcc-init stop | grep -c 'still')
         # If the result is "Service dafilesrv, mydafilesrv is still running."
         if [[ $res -ne 0 ]]
         then
-
             WritePlainLog "res: $res" "$logFile"
             $TARGET_DIR/etc/init.d/dafilesrv stop >> $logFile 2>&1
         fi
@@ -458,7 +444,6 @@ then
             cmd="./unittest.sh"
             WriteMilestone "Unittests" "$logFile"
             WritePlainLog "cmd: ${cmd}" "$logFile"
-            #${cmd} 2>&1 | tee -a $logFile
             ${cmd} >> $logFile 2>&1
             
             popd
@@ -473,7 +458,6 @@ then
             cmd="./wutoolTest.sh"
             WriteMilestone "WUTooltest" "$logFile"
             WritePlainLog "cmd: ${cmd}" "$logFile"
-            #${cmd} 2>&1  | tee -a $logFile
             ${cmd} >> $logFile 2>&1
             
             popd
@@ -481,12 +465,11 @@ then
         
         if [ -n "$REGRESSION_TEST" ]
         then
-        
             PATH=$PATH:$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/bin:$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/sbin
             
             WritePlainLog "pushd ${PR_ROOT}" "$logFile"
             pushd ${TEST_DIR}
- 
+
             # Patch ecl-test.json to put log inside the smoketest-xxxx directory
             # TO-DO same with donload directory
             # file::127.0.0.1::opt::^H^P^C^C^Systems::testing::regress::download::0drvb10.txt
@@ -505,7 +488,7 @@ then
             WriteMilestone "Regression setup" "$logFile"
             WritePlainLog "${cmd}" "$logFile"
             
-
+            #${cmd} 2>&1  | tee -a $logFile
             ${cmd} >> $logFile 2>&1
             
             [[ -f ${PR_ROOT}/setup.summary ]] && rm ${PR_ROOT}/setup.summary
@@ -557,7 +540,6 @@ then
                     fi
                 fi
             fi
-
 
             inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" )
             if [ -n "${inSuiteErrorLog}" ]
@@ -626,7 +608,6 @@ then
 
     WritePlainLog "Check core files in $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/." "$logFile"
 
-
     cores=( $(find $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/ -name 'core*' -type f -exec printf "%s\n" '{}' \; ) )
     
     if [ ${#cores[@]} -ne 0 ]
@@ -659,13 +640,12 @@ then
             WritePlainLog "corename: ${corename}, comp: ${comp}, compnamepart: ${compnamepart}, component name: ${compname}" "$logFile"
             components+=compname
             gdb --batch --quiet -ex "set interactive-mode off" -ex "echo \nBacktrace for all threads\n==========================" -ex "thread apply all bt" -ex "echo \n Registers:\n==========================\n" -ex "info reg" -ex "echo \n Disas:\n==========================\n" -ex "disas" -ex "quit" "$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/bin/${compname}" $core > $core.trace 2>&1
-
         done
 
         # Add core files to ZIP
         for core in ${cores[@]:0:$numberOfCoresTobeArchive}; do echo $core; done | zip ${HPCC_CORE_ARCHIVE} -@ >> ${HPCC_CORE_ARCHIVE}.log
         
-        # Addd binaries
+        # Add binaries
         for comp in ${componenets[@]}; do echo "$PR_ROOT/$TARGET_DIR/opt/HPCCSystems/bin/${comp}"; done | zip ${HPCC_CORE_ARCHIVE} -@ >> ${HPCC_CORE_ARCHIVE}.log
         
         # Add trace files to ZIP
@@ -678,7 +658,6 @@ then
 
     else
         WritePlainLog "There is no core file in /var/lib/HPCCSystems/" "$logFile"
-
     fi
 
     WritePlainLog "Store trace file(s) from ${TEST_LOG_DIR} into the relatted ZAP file " "$logFile"
@@ -692,14 +671,10 @@ then
 
     popd
     WritePlainLog "Done." "$logFile"
-    
-    # Only for debug purpose
-
 
     zip ${HPCC_LOG_ARCHIVE} ${PR_ROOT}/build/esp/src/eclwatch_build_*.txt >> $logFile 2>&1
     zip ${HPCC_LOG_ARCHIVE} -r ${PR_ROOT}/build/esp/src/build/*.txt >> $logFile 2>&1
 
-    # We are not installing packages we don't need to uninstall
     # However we need to stop HPCC
     hpccRunning=$( $TARGET_DIR/etc/init.d/hpcc-init status | grep -c "running")
     WritePlainLog "Local $hpccRunning running components" "$logFile"
@@ -715,6 +690,8 @@ then
             WritePlainLog "res: $res" "$logFile"
             $TARGET_DIR/etc/init.d/dafilesrv stop
         fi
+        # give it some time
+        #sleep 5
 
         hpccRunning=$( $TARGET_DIR/etc/init.d/hpcc-init status | grep -c "running")
         if [[ $hpccRunning -ne 0 ]]

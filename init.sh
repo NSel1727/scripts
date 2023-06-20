@@ -24,7 +24,7 @@ myEcho "PUBLIC_HOSTNAME: '$PUBLIC_HOSTNAME'"
 
 IP_FULL_PATH=$( which "ip" )
 myEcho "IP_FULL_PATH: '$IP_FULL_PATH'"
-LOCAL_IP=$($IP_FULL_PATH -4 addr | egrep '10\.' | awk '{ print $2 }' | cut -d / -f1)
+LOCAL_IP=$($IP_FULL_PATH -4 addr | grep -E '10\.' | awk '{ print $2 }' | cut -d / -f1)
 myEcho "LOCAL_IP: '$LOCAL_IP'"
 
 INSTANCE_NAME="PR-12701"
@@ -32,13 +32,12 @@ DOCS_BUILD=0
 DOCS_BUILD_STR=''
 KEEP_FILES=1
 DRY_RUN=0
-AVERAGE_SESSION_TIME=0.75 # Hours for m4.4xlarge instance
 AVERAGE_SESSION_TIME=1.2 # Hours for m4.2xlarge instance
 BASE_TEST=0
 BASE_TAG=''
 BASE='master'
 
-SYSTEM_ID=$( cat /etc/*-release | egrep -i "^PRETTY_NAME" | cut -d= -f2 | tr -d '"' )
+SYSTEM_ID=$( cat /etc/*-release | grep -E -i "^PRETTY_NAME" | cut -d= -f2 | tr -d '"' )
 if [[ "${SYSTEM_ID}" == "" ]]
 then
     SYSTEM_ID=$( cat /etc/*-release | head -1 )
@@ -57,7 +56,7 @@ do
     
         instance*)  INSTANCE_NAME=${param//instanceName=/}
                 INSTANCE_NAME=${INSTANCE_NAME//\"/}
-                #INSTANCE_NAME=${INSTANCE_NAME//PR/PR-}
+
                 myEcho "Instance  name: '${INSTANCE_NAME}'"
                 # To keep listTests3.py happy
                 echo "Instance name: '${INSTANCE_NAME}'"
@@ -90,9 +89,6 @@ do
                 ;;
                 
         baseTest*) BASE_TEST=1
-#                BASE_TAG=${param//baseTest=/}
-#                BASE_TAG=${BASE_TAG//\"/}
-#                myEcho "Execute base test with tag: ${BASE_TAG}"
                 ;;
                 
         base*) BASE=${param//base=/}
@@ -105,23 +101,6 @@ do
     shift
 done
 
-#cat << DATASTAX_ENTRIES | sudo tee /etc/yum.repos.d/datastax.repo
-#[datastax]
-#name = DataStax Repo for Apache Cassandra
-#baseurl = https://rpm.datastax.com/community
-#enabled = 1
-#gpgcheck = 0
-#DATASTAX_ENTRIES
-
-# Ignore Cassandra
-#cat << CASSANDRA_ENTRIES | sudo tee /etc/yum.repos.d/cassandra.repo
-#[cassandra]
-#name=Apache Cassandra
-#baseurl=https://www.apache.org/dist/cassandra/redhat/311x/
-#gpgcheck=0
-#repo_gpgcheck=0
-#gpgkey=https://www.apache.org/dist/cassandra/KEYS
-#CASSANDRA_ENTRIES
 myEcho "-------------------------------------"
 
 # Commented out when the latest CentOS 7 AMI has this version of nodejs
@@ -141,15 +120,10 @@ else
 fi
 myEcho "-------------------------------------"
 
-#PACKAGES_TO_INSTALL="expect mailx dsc30 cassandra30 cassandra30-tools bc psmisc"
-#PACKAGES_TO_INSTALL="expect mailx dsc cassandra cassandra-tools bc psmisc git ncurses-devel"
 PACKAGES_TO_INSTALL="expect mailx bc psmisc"
 
-#if [ $DOCS_BUILD -eq 1 ]
-#then
-    wget http://mirror.centos.org/centos/7/os/x86_64/Packages/fop-1.1-6.el7.noarch.rpm
-    PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL fop-1.1"
-#fi
+wget http://mirror.centos.org/centos/7/os/x86_64/Packages/fop-1.1-6.el7.noarch.rpm
+PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL fop-1.1"
 
 # This related to Bokeh installation, but should be here because it removes perl-IPC-Cmd 
 # (needs to build OpenSSL) as well.
@@ -192,7 +166,6 @@ sudo make install
 myEcho "   Done"
 myEcho "-------------------------------------"
 popd
-
 
 GUILLOTINE=$( echo " 2 * $AVERAGE_SESSION_TIME * 60" | bc |  xargs printf "%.0f" ) # minutes ( 2 x AVERAGE_SESSION_TIME)
 printf "AVERAGE_SESSION_TIME = %f hours, GUILLOTINE = %d minutes\n" "$AVERAGE_SESSION_TIME" "$GUILLOTINE"
@@ -239,7 +212,7 @@ then
     myEcho "$CURL_7_81 found, unzip and install it"
     gunzip -c curl-7.81.0.tar.gz | tar xvf -
     pushd curl-7.81.0
-    #./configure --with-ssl && \
+
     ./configure --with-gnutls --with-ssl
     make -j && \
     sudo make install
@@ -333,7 +306,6 @@ then
     sudo yum clean all
     sudo yum makecache
     sudo rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
-
     sudo yum install -y mono-complete 
 
 else
@@ -462,8 +434,7 @@ then
     myEcho "     Res: ${res}"
     popd
     cp -v ../build.sh .
-    #myEcho "Update PATH..."
-    #export PATH=$PATH:/usr/local/bin:/bin:/usr/local/sbin:/sbin:/usr/sbin:
+    
     myEcho "path: $PATH"
     type "cmake"
     cmake --version;
@@ -488,7 +459,7 @@ INSTANCE_ID=$( wget -q -t1 -T1 -O - http://169.254.169.254/latest/meta-data/inst
 
 if [[ $DRY_RUN -eq 0 ]]
 then
-    DEVTOOLSET=$( scl -l | egrep 'devtoolset' | tail -n 1 )
+    DEVTOOLSET=$( scl -l | grep -E 'devtoolset' | tail -n 1 )
     if [[ $BASE_TEST  -eq 1 ]]
     then
         # For base test
@@ -497,8 +468,6 @@ then
         # Add self destruction with email notification
         ( crontab -l; echo ""; echo "# Self destruction initiated in ${GUILLOTINE} minutes"; echo $( date  -d "$today + ${GUILLOTINE} minutes" "+%M %H %d %m") " * sleep 10; echo \"At $(date '+%Y.%m.%d %H:%M:%S') the ${INSTANCE_ID} is still running, terminate it.\" | mailx -s \"Instance self-destruction initiated\" attila.vamos@gmail.com; sudo shutdown now " ) | crontab
         
-        # Add self destruction without email notification
-        #( crontab -l; echo ""; echo "# Self destruction initiated in ${GUILLOTINE} minutes"; echo $( date  -d "$today + ${GUILLOTINE} minutes" "+%M %H %d %m") " * sleep 10; sudo shutdown now " ) | crontab
     else
         # For PR test
         ( crontab -l; echo $( date  -d "$today + $timeStep minute" "+%M %H %d %m") " * source ~/.bashrc; cd ~/smoketest; ./update.sh; export commitId=${COMMIT_ID}; export addGitComment=${ADD_GIT_COMMENT}; export runOnce=1; export keepFiles=$KEEP_FILES; export testOnlyOnePR=1; export testPrNo=$prId; export runFullRegression=1; export useQuickBuild=0; export skipDraftPr=0; export AVERAGE_SESSION_TIME=$AVERAGE_SESSION_TIME; scl enable $DEVTOOLSET './smoketest.sh'" ) | crontab
@@ -506,15 +475,15 @@ then
         # Add self destruction with email notification
         ( crontab -l; echo ""; echo "# Self destruction initiated in ${GUILLOTINE} minutes"; echo $( date  -d "$today + ${GUILLOTINE} minutes" "+%M %H %d %m") " * sleep 10; echo \"At $(date '+%Y.%m.%d %H:%M:%S') the ${INSTANCE_ID} is still running, terminate it.\" | mailx -s \"Instance self-destruction initiated\" attila.vamos@gmail.com; sudo shutdown now " ) | crontab
         
-        # Add self destruction without email notification
-        #( crontab -l; echo ""; echo "# Self destruction initiated in ${GUILLOTINE} minutes"; echo $( date  -d "$today + ${GUILLOTINE} minutes" "+%M %H %d %m") " * sleep 10; sudo shutdown now " ) | crontab
+
+
     fi
 else
     # For base test
     if [[ $BASE_TEST  -eq 1 ]]
     then
-        # Ensure it is never kick off, but to check the crontab entry s ok
-        ( crontab -l; echo $( date  -d "$today + 20 minutes" "+%M %H %d %m") " *  DEVTOOLSET=$( scl -l | egrep 'devtoolset' | tail -n 1 ); . scl_source enable ${DEVTOOLSET}; export CL_PATH=/opt/rh/${DEVTOOLSET}/root/usr; export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH};cd ~/smoketest; ./update.sh; export commitId=${COMMIT_ID}; export addGitComment=${ADD_GIT_COMMENT}; export runOnce=1; export keepFiles=$KEEP_FILES; export testOnlyOnePR=1; export testPrNo=$prId; export runFullRegression=1; export useQuickBuild=0; export skipDraftPr=0; export AVERAGE_SESSION_TIME=$AVERAGE_SESSION_TIME; cd ${INSTANCE_NAME}; ./build.sh -tests='*.ecl ' -docs=False -unittest=True -wuttest=True -keepFiles=False -enableStackTrace=True" ) | crontab
+        # Ensure it is never kick off, but to check the crontab entry is ok
+        ( crontab -l; echo $( date  -d "$today + 20 minutes" "+%M %H %d %m") " *  DEVTOOLSET=$( scl -l | grep -E 'devtoolset' | tail -n 1 ); . scl_source enable ${DEVTOOLSET}; export CL_PATH=/opt/rh/${DEVTOOLSET}/root/usr; export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH};cd ~/smoketest; ./update.sh; export commitId=${COMMIT_ID}; export addGitComment=${ADD_GIT_COMMENT}; export runOnce=1; export keepFiles=$KEEP_FILES; export testOnlyOnePR=1; export testPrNo=$prId; export runFullRegression=1; export useQuickBuild=0; export skipDraftPr=0; export AVERAGE_SESSION_TIME=$AVERAGE_SESSION_TIME; cd ${INSTANCE_NAME}; ./build.sh -tests='*.ecl ' -docs=False -unittest=True -wuttest=True -keepFiles=False -enableStackTrace=True" ) | crontab
     else
         ( crontab -l; echo $( date  -d "$today + $timeStep minute" "+%M %H %d %m") " * cd ~/smoketest; ./update.sh; cd $INSTANCE_NAME; echo 'Build: success' > build.summary; export addGitComment=${ADD_GIT_COMMENT} " ) | crontab
     fi
@@ -528,18 +497,19 @@ BREAK_TIME=27 # $(( ${GUILLOTINE} - 10 ))
 BREAK_TIME=$(( ${GUILLOTINE} * 8 / 10 ))
 PROCESS_TO_KILL="build.sh"  #"ecl-test"
 ( crontab -l; echo ""; echo "# Send Ctrl - C to Regression Test Engine after ${BREAK_TIME} minutes"; echo $( date -d " + ${BREAK_TIME} minutes" "+%M %H %d %m") " * REGRESSION_TEST_ENGINE_PID=\$( pgrep -f $PROCESS_TO_KILL ); while [[ -z \"\$REGRESSION_TEST_ENGINE_PID\" ]] ; do date; sleep 10; REGRESSION_TEST_ENGINE_PID=\$( pgrep -f $PROCESS_TO_KILL ); done; echo \"Regression test engine PID(s): \$REGRESSION_TEST_ENGINE_PID\"; sudo kill -SIGINT -- \${REGRESSION_TEST_ENGINE_PID}; sleep 10; sudo kill -SIGINT -- \${REGRESSION_TEST_ENGINE_PID}; " ) | crontab
-myEcho "Update Pyhon3"
+
+myEcho "Update Python3"
 # Install, prepare and start Bokeh
 myEcho "Python version: $( python --version 2>&1 )"
 myEcho "Python2 version: $( python2 --version 2>&1 )"
 myEcho "Python3 version: $( python3 --version )"
 
-myEcho "Before fix Pyhon3"
+myEcho "Before fix Python3"
 myEcho "$(ls -l /usr/bin/python3*)"
 sudo python2 /usr/bin/yum reinstall -y python3 python3-libs
 sudo rm -v /usr/bin/python3
 sudo ln -s /usr/local/bin/python3.6 /usr/bin/python3
-myEcho "After fix Pyhon3"
+myEcho "After fix Python3"
 myEcho "$(ls -l /usr/bin/python3*)"
 
 myEcho "Install Bokeh"
@@ -548,8 +518,8 @@ myEcho "p3: '$p3'"
 sudo ${p3} install --upgrade pip
 p3=$(which "pip3")
 myEcho "p3: '$p3'"
-#myEcho "Remove pyparsing"
-#sudo yum remove -y pyparsing
+
+
 myEcho "Install pandas bokeh pyproj"
 sudo ${p3} install pandas bokeh pyproj
 
@@ -562,9 +532,6 @@ myEcho "$(bokeh info)"
 
 myEcho "Prepare Bokeh"
 cd ~/smoketest
-# Don't use Public IP, out network may refuse to connect to it
-#sed -e 's/origin=\(ec2.*\)/origin='"$PUBLIC_IP"':5006/g' ./startBokeh_templ.sh>  ./startBokeh.sh
-#myEcho "Bokeh address: $PUBLIC_IP:5006"
 
 if [[ -n $PUBLIC_HOSTNAME ]]
 then

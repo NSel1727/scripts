@@ -3,19 +3,13 @@
 PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 #set -x
 
-#engine=''
-#hthor_queries=''
 debug=0
 
 printf "engine,pq,queries,elaps,engine,pq,queries,elaps,engine,pq,queries,elaps,test,summary\n"
 while read fn
 do
-    # echo $fn
     while read line; 
     do 
-        
-    #    echo $line;
-        
         if [[ "$line" =~ "Test" ]]
         then 
             testTime=$( echo "$line" |  sed 's/Test time\s*:\s*//g'  | awk '{print $1 }' );
@@ -72,10 +66,10 @@ do
             continue
         fi
             
-    done < <(egrep '^Cores|^Speed| Queries:|Elapsed|--pq|Test time|Summary' $fn | grep -zoP 'ecl-test run -t hthor(?![\s\S]*ecl-test run -t hthor )[\s\S]*\z' )
+    done < <(grep -E '^Cores|^Speed| Queries:|Elapsed|--pq|Test time|Summary' $fn | grep -zoP 'ecl-test run -t hthor(?![\s\S]*ecl-test run -t hthor )[\s\S]*\z' )
 
     printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "hthor" "$hthor_pq" "$hthor_queries" "$hthor_elaps" "thor" "$thor_pq" "$thor_queries" "$thor_elaps" "roxie" "$roxie_pq" "$roxie_queries" "$roxie_elaps"  "$testTime" "$summaryTime"
     
 done < <(find PR-*/ -iname 'RelWithDebInfo_Build_*' -type f -print | sort )
 
-echo "$ENV" |  egrep 'hthor|thor|roxie'
+echo "$ENV" |  grep -E 'hthor|thor|roxie'

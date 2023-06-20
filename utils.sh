@@ -21,10 +21,8 @@ SPEED_OF_CPUS_UNIT='MHz'
 
 BOGO_MIPS_OF_CPUS=$( grep 'bogomips' /proc/cpuinfo | awk '{printf "%5.0f\n", $3}' | sort -nru | head -1 )
 
-#PARALLEL_QUERIES=$(( $NUMBER_OF_CPUS - 3 ))
 PARALLEL_QUERIES=$NUMBER_OF_CPUS
 PARALLEL_QUERIES_SETUP=$NUMBER_OF_CPUS
-
 
 NUMBER_OF_BUILD_THREADS=$NUMBER_OF_CPUS
 
@@ -38,15 +36,13 @@ MEMORY=$MEMORY_GB
 MEM_CORE_RATIO=$( echo "$MEMORY_GB $NUMBER_OF_CPUS" | awk '{printf "%.3f", $1 / $2 }' )
 MEM_CORE_RATIO_UNIT='GB/core'
 
-THOR_SLAVES=4
+THOR_SLAVES=4 
 
 if [[ -d $TARGET_DIR ]]
 then
     WritePlainLog "Remove $TARGET_DIR before build" "$logFile"
     rm -rf $TARGET_DIR
 fi
-
-
 
 # It would be nice to put some formula here to calculate timeouts based on
 # the current environment like number of CPU/core, BOGO mips, mem core ration, disk speed, etc
@@ -66,23 +62,17 @@ TEST_1=( "schedule1.ecl" "90" )
 TEST_2=( "workflow_9c.ecl" "90" )
 TEST_3=( "workflow_contingency_8.ecl" "20" )
 TEST_4=( "schedule2.ecl" "150" )
-#TEST_5=( "teststdlibrary.ecl" "1500" )
 
 TIMEOUTS=( 
     TEST_1[@] 
     TEST_2[@] 
     TEST_3[@] 
     TEST_4[@]
-#    TEST_5[@] 
     )
 
 TARGET=all
-#TARGET=hthor
 
-GLOBAL_EXCLUSION="-e 3rdparty"
-GLOBAL_EXCLUSION="-e=embedded,3rdparty"
-#GLOBAL_EXCLUSION="--ef pipefail.ecl,layouttrans_disabled.ecl -e=embedded,3rdparty"
-GLOBAL_EXCLUSION="--ef pipefail.ecl,prefetch4.ecl,loopthor2.ecl -e=embedded,3rdparty,stress,spray"
+GLOBAL_EXCLUSION="--ef pipefail.ecl,loopthor2.ecl -e=embedded,3rdparty,stress,spray"
 PYTHON_PLUGIN=''
 
 # Patch/hack some CMakeLists.txt to enable parallel build for them
@@ -118,7 +108,7 @@ fi
 # Get system info 
 #
 
-SYSTEM_ID=$( cat /etc/*-release | egrep -i "^PRETTY_NAME" | cut -d= -f2 | tr -d '"' )
+SYSTEM_ID=$( cat /etc/*-release | grep -E -i "^PRETTY_NAME" | cut -d= -f2 | tr -d '"' )
 if [[ "${SYSTEM_ID}" == "" ]]
 then
     SYSTEM_ID=$( cat /etc/*-release | head -1 )
@@ -130,8 +120,6 @@ SYSTEM_ID=${SYSTEM_ID//./_}
 
 OBT_SYSTEM="Smoketest"
 OBT_SYSTEM_ENV="Smoketest"
-
-
 
 #
 #-----------------------------------------------------------
@@ -150,9 +138,7 @@ WriteEnvInfo()
     echo "CPU speed: $SPEED_OF_CPUS $SPEED_OF_CPUS_UNIT" >> $logFile
 
     echo "CPU Bogo Mips: $BOGO_MIPS_OF_CPUS"
-    echo "CPU Bogo Mips: $BOGO_MIPS_OF_CPUS" >> $logFile
-
-    #NUMBER_OF_CPUS=$(( 2 * ${NUMBER_OF_CPUS} ))
+    echo "CPU Bogo Mips: $BOGO_MIPS_OF_CPUFS" >> $logFile
 
     if [[ $NUMBER_OF_CPUS -ge 20 ]]
     then
@@ -227,9 +213,9 @@ ProcessLog()
 CheckResult()
 {
     logFile=$1
-    #cmd=" egrep '\s[E|e]rror([s]*[\:\s]|\s[0-9]*[^a^o])|ValidationException:|undefined reference|No such file or directory|not found'"
-    cmd=" egrep '\s[E|e]rror([s]*[\:\s]|\s[0-9]*[^a^o])|ValidationException:|undefined reference|No such file or directory|CMake Error|Cannot find module'"
-    #numberOfError=$( grep '[E|e]rror[\:\s][0-9]*' -c $logFile ) 
+
+    cmd=" grep -E '\s[E|e]rror([s]*[\:\s]|\s[0-9]*[^a^o])|ValidationException:|undefined reference|No such file or directory|CMake Error|Cannot find module'"
+
     numberOfError=$( eval ${cmd} -c $logFile )
     WritePlainLog "Error(s): ${numberOfError}" "$logFile"
     echo "Error(s): ${numberOfError}" >> ../build.summary
@@ -237,7 +223,7 @@ CheckResult()
     errors=$( eval ${cmd} $logFile )
     WritePlainLog "${errors}" "$logFile"
     echo "${errors}" >> ../build.summary
-    #echo "" >> ../build.summary
+
 
     CheckCMakeResult "${logFile}"
 }
@@ -246,7 +232,7 @@ CheckCMakeResult()
 {
     logFile=$1
     # Check CMake errors
-    cmd=" egrep 'Configuring incomplete|CMake Error'"
+    cmd=" grep -E 'Configuring incomplete|CMake Error'"
     numberOfCMakeError=$( eval ${cmd} -c $logFile )
     if [[ $numberOfCMakeError -gt 0 ]]
     then
@@ -274,14 +260,12 @@ CheckEclWatchBuildResult()
 {
     logFile=$1
     echo "Get ECLWatch build result"
-    #cmd2=" egrep -A 7 '\-\- ECL Watch:(.*)Rebuilding'"
+
     ECLW_START="-- ECL Watch:  Rebuilding"
     ECLW_END="CPack: Create package"
     cmd2=' sed -n "/^$ECLW_START/,/$ECLW_END/ { /^$/d ; p }" '
     eclWatchResult=$( eval ${cmd2} $logFile )
     echo "${eclWatchResult}"
-    #echo "${eclWatchResult}" >> $logFile 2>&1
-    #echo "${eclWatchResult}" >> ../build.summary
 }
 
 
@@ -350,36 +334,32 @@ UninstallHpcc()
 {
     logFile=$1
     
-    #if [ $KEEP_FILES -eq 1 ]
-    #then
-    #    WritePlainLog "Keep files therefore skip HPCC Uninstall" "$logFile"
-    #else
-        WritePlainLog "We keep the source and build files only" "$logFile"
-        WritePlainLog "so, uninstall HPCC..." "$logFile"
-        if [ -f /opt/HPCCSystems/sbin/complete-uninstall.sh ]
-        then
-            # Check '-p' parameter
-            purge=$( /opt/HPCCSystems/sbin/complete-uninstall.sh -h | while read l; do [[ "${l}" =~ "-p, " ]] && echo "-p"; done )
-            sudo /opt/HPCCSystems/sbin/complete-uninstall.sh $purge 
 
-            WritePlainLog "HPCC Uninstall: OK" "$logFile"
+    WritePlainLog "We keep the source and build files only" "$logFile"
+    WritePlainLog "so, uninstall HPCC..." "$logFile"
+    if [ -f /opt/HPCCSystems/sbin/complete-uninstall.sh ]
+    then
+        # Check '-p' parameter
+        purge=$( /opt/HPCCSystems/sbin/complete-uninstall.sh -h | while read l; do [[ "${l}" =~ "-p, " ]] && echo "-p"; done )
+        sudo /opt/HPCCSystems/sbin/complete-uninstall.sh $purge 
+
+        WritePlainLog "HPCC Uninstall: OK" "$logFile"
+        if [ -f "/etc/HPCCSystems/environment.xml" ]
+        then
+            WritePlainLog "Remove environment.conf and .xml" "$logFile"
+            sudo rm -f '/etc/HPCCSystems/environment.*'
+            
             if [ -f "/etc/HPCCSystems/environment.xml" ]
             then
-                WritePlainLog "Remove environment.conf and .xml" "$logFile"
-                sudo rm -f '/etc/HPCCSystems/environment.*'
-                
-                if [ -f "/etc/HPCCSystems/environment.xml" ]
-                then
-                    WritePlainLog "  Failed." "$logFile"
-                else
-                    WritePlainLog "  Success." "$logFile"
-                fi
+                WritePlainLog "  Failed." "$logFile"
+            else
+                WritePlainLog "  Success." "$logFile"
             fi
-        else
-            WritePlainLog "HPCC Uninstall: failed (Missing 'complete-uninstall.sh' file.)" "$logFile"
         fi
-    #fi
-    
+    else
+        WritePlainLog "HPCC Uninstall: failed (Missing 'complete-uninstall.sh' file.)" "$logFile"
+    fi
+
     WritePlainLog "Remove Cassandra leftovers." "$logFile"
     sudo rm -rf /var/lib/cassandra/*
     sudo rm -r /var/log/cassandra
@@ -404,7 +384,7 @@ archiveOldLogs()
     fi
     # Move all *.log, *test*.summary, *.diff, *.txt and *.old files into a zip archive.
     # TO-DO check if there any. e.g. for a new PR there is not any file to archive
-    find . -maxdepth 1 -mmin +$age -type f -iname '*.log' -o -iname '*test*.summary' -o -iname '*.diff' -o -iname '*.txt' -o -iname '*.old' | egrep -v 'result-|RelWith' | zip -m -u old-logs-${timestamp} -@
+    find . -maxdepth 1 -mmin +$age -type f -iname '*.log' -o -iname '*test*.summary' -o -iname '*.diff' -o -iname '*.txt' -o -iname '*.old' | grep -E -v 'result-|RelWith' | zip -m -u old-logs-${timestamp} -@
 
 }
 
@@ -414,7 +394,7 @@ cleanUpLeftovers()
     
     query="thor|roxie|d[af][fslu]|ecl[s|c|\s|a][g|c]|sase|esp|topo"
     WritePlainLog "Stop hpcc to remove leftover admin stuff" "$logFile"
-    process=$(ps aux | egrep -v "[g]rep" | egrep "${query}" | head -n 1 )
+    process=$(ps aux | grep -E -v "[g]rep" | grep -E "${query}" | head -n 1 )
 
     #WritePlainLog "Process: '${process}'" "$logFile"
     if [ "${process}" != "" ]
@@ -458,7 +438,7 @@ cleanUpLeftovers()
     fi
     
     # Check if HPCC Systems is installed
-    IS_INSTALLED=$( sudo ${PKG_QRY_CMD} hpccsystems-platform | egrep '[h]pcc' | tr -s ' ' | cut -d$' ' -f2 )
+    IS_INSTALLED=$( sudo ${PKG_QRY_CMD} hpccsystems-platform | grep -E '[h]pcc' | tr -s ' ' | cut -d$' ' -f2 )
     if [[ "$IS_INSTALLED." != "." ]]
     then
         WritePlainLog "${IS_INSTALLED} is installed, remove" "$logFile"

@@ -15,15 +15,10 @@ echo "Restart bokeh"
 BOKEH=$(which "bokeh")
 echo "Bokeh: $BOKEH"
 
-PYTHON_MAIN_VERSION=$( ${BOKEH} info | egrep '^Python' | awk '{ print $4 }' | cut -d. -f1)
+PYTHON_MAIN_VERSION=$( ${BOKEH} info | grep -E '^Python' | awk '{ print $4 }' | cut -d. -f1)
 echo "Python main version: $PYTHON_MAIN_VERSION"
-if [[ ${PYTHON_MAIN_VERSION} -eq 3 ]]
-then
-    PYTHON_APPS="listTests3.py showStatus.py"
-else
-    PYTHON_APPS="showStatus.py showSchedulerStatus.py listTests.py"
-fi
 
+PYTHON_APPS="listTests3.py showStatus.py showSchedulerStatus.py"
 echo "Python apps: $PYTHON_APPS"
 
 unbuffer ${BOKEH} serve ${PYTHON_APPS} \
@@ -32,5 +27,4 @@ unbuffer ${BOKEH} serve ${PYTHON_APPS} \
 
 # On ONT-011 we can use hostname
 #unbuffer bokeh serve ${PYTHON_APPS} --allow-websocket-origin=$(hostname):5006
-
 

@@ -8,8 +8,6 @@ pwd=$( pwd )
 PR_ROOT=${pwd}
 SOURCE_ROOT=${PR_ROOT}/HPCC-Platform
 BUILD_TYPE=RelWithDebInfo
-#BUILD_TYPE=Debug
-#COMMON_RTE_DIR=$( dirname $PR_ROOT)/rte
 RTE_DIR=$PR_ROOT/rte
 RESULT_DIR=${PR_ROOT}/HPCCSystems-regression
 TEST_DIR=${SOURCE_ROOT}/testing/regress
@@ -36,8 +34,6 @@ PARALLEL_REGRESSION_TEST=1
 hthorTestLogFile=$PR_ROOT/${BUILD_TYPE}"_Regress_Hthor_"$date".log";
 if [[ $NUMBER_OF_CPUS -eq 8 ]]
 then
-    #HTHOR_PQ=$(( $NUMBER_OF_CPUS / 4  + (($RANDOM %  3) - 1 ) ))  # 1, 2 or 3
-    #HTHOR_PQ=$(( $NUMBER_OF_CPUS / 4  + ( $RANDOM %  2 ) ))  #  2 or 3
     HTHOR_PQ=$(( $NUMBER_OF_CPUS / 4  + ( $RANDOM % 3 ) ))  #  2, 3 or 4
 else
     HTHOR_PQ=$(( $NUMBER_OF_CPUS  / 4 ))   # 4 on AWS
@@ -47,7 +43,6 @@ unset HTHOR_PID
 thorTestLogFile=$PR_ROOT/${BUILD_TYPE}"_Regress_Thor_"$date".log";
 if [[ $NUMBER_OF_CPUS -eq 8 ]]
 then
-    #THOR_PQ=$((  5 * $NUMBER_OF_CPUS / 8  + (($RANDOM %  3) - 1 ) ))  # 5, 6, or 7
     THOR_PQ=$((  6 * $NUMBER_OF_CPUS / 8  + ($RANDOM %  3) ))  #  6, 7 or 8
 else
     THOR_PQ=$(( $NUMBER_OF_CPUS * 7 / 8 ))   # 14 on AWS
@@ -57,8 +52,6 @@ unset THOR_PID
 roxieTestLogFile=$PR_ROOT/${BUILD_TYPE}"_Regress_Roxie_"$date".log";
 if [[ $NUMBER_OF_CPUS -eq 8 ]]
 then
-    #ROXIE_PQ=$((   $NUMBER_OF_CPUS / 4  + (($RANDOM %  3) - 1 ) ))  # 1, 2 or 3
-    #ROXIE_PQ=$((   $NUMBER_OF_CPUS / 4  + ($RANDOM %  2) ))  #  2 or 3
     ROXIE_PQ=$((   $NUMBER_OF_CPUS / 4  + ($RANDOM % 3) ))  #  2, 3 or 4
 else
     ROXIE_PQ=$(( $NUMBER_OF_CPUS  / 4 ))   # 4 on AWS
@@ -86,11 +79,6 @@ archiveOldLogs "$logFile" "$date"
 
 cleanUpLeftovers "$logFile" 
 
-#res=$(  exec >> ${logFile} 2>&1 )
-#exec > ${logFile} 2>&1
-#echo "Res:${res}"
-#echo "Res:${res}" >> $logFile 2>&1
-#echo "logFile:$logFile"
 
 echo "====================================================" >> $logFile 2>&1
 echo "I am $(whoami)"  >> $logFile 2>&1
@@ -115,12 +103,6 @@ echo "----------------------------------"   >> $logFile 2>&1
 echo "Content of /usr/local/share/aclocal/ " >> $logFile 2>&1
 ls -l  /usr/local/share/aclocal/ >> $logFile 2>&1
 echo "====================================================" >> $logFile 2>&1
-
-MyEcho ()
-{
-    param=$1
-    WritePlainLog "${param}" "$resultFile"
-}
 
 MyExit ()
 {
@@ -211,11 +193,6 @@ BUILD_ROOT=build
 if [ ! -d ${BUILD_ROOT} ]
 then
     mkdir ${BUILD_ROOT}
-    # Experimental to use RAMDisk tas build directory
-    #res=$( free; sudo -S sync; echo 3 | sudo tee /proc/sys/vm/drop_caches; free )
-    #WritePlainLog "res:${res}" "$resultFile"
-    #sudo mount -t tmpfs -o noatime,size=6G tmpfs $(pwd)/${BUILD_ROOT}
-    #WritePlainLog " $( mount | egrep '/home/ati/Smoketest' )" "$resultFile"
 fi
 WritePlainLog "BUILD_ROOT:$BUILD_ROOT" "$resultFile"
 
@@ -358,7 +335,7 @@ WritePlainLog "Loglevel: ${LOGLEVEL}" "$logFile"
 #--------------------------------------
 # Check plugins (especially Pythons) and apply exclusion if it is need
 
-additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.in | egrep '^additionalPlugins'| cut -d= -f2 ))
+additionalPlugins=($( cat $SOURCE_ROOT/initfiles/etc/DIR_NAME/environment.conf.in | grep -E '^additionalPlugins'| cut -d= -f2 ))
 for plugin in ${additionalPlugins[*]}
 do 
     upperPlugin=${plugin^^} 
@@ -389,8 +366,8 @@ do
                         REGRESSION_TEST=${REGRESSION_TEST}" *py*"
                     fi
                     
-                    WritePlainLog "line in suite: $( egrep '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )'." "$logFile"
-                    excludeInclude=$( egrep -c '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )
+                    WritePlainLog "line in suite: $( grep -E '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )'." "$logFile"
+                    excludeInclude=$( grep -E -c '\(not included \) and excluded' $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py )
                     WritePlainLog "excludeInclude: ${excludeInclude} (path: $SOURCE_ROOT/testing/regress/hpcc/regression/suite.py)" "$logFile"
 
                     [[ $excludeInclude -eq 1 ]] && GLOBAL_EXCLUSION="$GLOBAL_EXCLUSION -r=python3"
@@ -429,12 +406,6 @@ git clone https://github.com/AttilaVamos/OBT.git >> ${logFile} 2>&1
 popd
 WritePlainLog "Done." "$logFile"
 
-
-#echo "Update Git submodules"
-#echo "Update Git submodules" >> $logFile 2>&1
-
-#git submodule update --init --recursive
-
 #-------------------------------------------------
 #
 # Set core file generation and be named core_[program].[pid]
@@ -464,7 +435,7 @@ cd $PR_ROOT
 cd ${BUILD_ROOT}
 
 MAKE_FILE="$SOURCE_ROOT/cmake_modules/buildBOOST_REGEX.cmake"
-BOOST_URL=$( egrep 'URL ' $MAKE_FILE | awk '{print $2}')
+BOOST_URL=$( grep -E 'URL ' $MAKE_FILE | awk '{print $2}')
 BOOST_PKG=${BOOST_URL##*/}; 
 res=$( wget -v --spider  $BOOST_URL )
 isDownloadable=$?
@@ -478,26 +449,14 @@ then
         if [[ ! -f ${BUILD_ROOT}/downloads/$BOOST_PKG ]]
         then
             WritePlainLog "There is not '${BUILD_ROOT}/downloads/$BOOST_PKG' file." "$logFile"
-            #mkdir -p ${BUILD_ROOT}/downloads/boost_1_71_0
-            #res=$( cp -v $HOME/boost_1_71_0.tar.gz ${BUILD_ROOT}/downloads/ 2>&1 )
-            #WritePlainLog "res: ${res}" "$logFile"
-            #chmod 0766 ${BUILD_ROOT}/downloads/*.gz
-            #pushd ${BUILD_ROOT}/downloads
-            #tar -xzvf boost_1_71_0.tar.gz
-            #WritePlainLog "retcode: $?" "$logFile"
-            #popd
 
             WritePlainLog "Hack 'HPCC-Platform/cmake_modules/buildBOOST_REGEX.cmake' to use local copy" "$logFile"
             sed -i -e 's/URL \(.*\)$/URL '"${HOME//\//\\/}\/$BOOST_PKG"'/g' -e 's/URL_HASH/# URL_HASH/g' -e 's/TIMEOUT \(.*\)/TIMEOUT 90/g'  $MAKE_FILE
-            res=$( egrep 'URL |URL_HASH|TIMEOUT' $MAKE_FILE )
+            res=$( grep -E 'URL |URL_HASH|TIMEOUT' $MAKE_FILE )
             WritePlainLog "res:\n$res" "$logFile"
 
-            #wget -v  -O ${BUILD_ROOT}/downloads/boost_1_71_0.tar.gz  https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
             WritePlainLog "$( ls -l ${BUILD_ROOT}/downloads/*.gz )" "$logFile"
-            
-            #MAKE_FILE="../HPCC-Platform/cmake_modules/buildBOOST_REGEX.cmake"
-            #sed -e 's/TIMEOUT \(.*\)/TIMEOUT 60/g' ${MAKE_FILE} >temp.cmake && sudo mv -f temp.cmake ${MAKE_FILE}
-            #WritePlainLog "There is $( egrep 'TIMEOUT' ${MAKE_FILE} )" "$logFile"
+     
         fi
     else
         WritePlainLog "The $BOOST_PKG not found." "$logFile"
@@ -505,7 +464,7 @@ then
 else
     WritePlainLog "The $BOOST_PKG is downloadable." "$logFile"
     sed -e 's/TIMEOUT \(.*\)/TIMEOUT 180/g' ${MAKE_FILE} >temp.cmake && sudo mv -f temp.cmake ${MAKE_FILE}
-    res=$( egrep 'URL |TIMEOUT' $MAKE_FILE )
+    res=$( grep -E 'URL |TIMEOUT' $MAKE_FILE )
     WritePlainLog "res:\n$res" "$logFile"
 fi
 
@@ -542,21 +501,11 @@ fi
 popd
 
 WritePlainLog "Create makefiles $(date +%Y-%m-%d_%H-%M-%S)" "$logFile"
-#cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
-#cmake  -G"Eclipse CDT4 - Unix Makefiles" -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 -DSUPPRESS_PY3EMBED=ON -DINCLUDE_PY3EMBED=OFF -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
-#cmake  -G"Eclipse CDT4 - Unix Makefiles" -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 ${PYTHON_PLUGIN} -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -DECLWATCH_BUILD_STRATEGY=$ECLWATCH_BUILD_STRATEGY -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
-#GENERATOR="Eclipse CDT4 - Unix Makefiles"
+
 GENERATOR="Unix Makefiles"
 CMAKE_CMD=$'cmake -G "'${GENERATOR}$'"'
 CMAKE_CMD+=$' -D CMAKE_BUILD_TYPE='$BUILD_TYPE
-
-if [[ ( "${SYSTEM_ID}" =~ "Ubuntu_16_04" ) ]]
-then
-      # On Ubuntu 16.04 RPR VM I have not proper Python 3.6 so avoid to build plugins and Python stuff
-      CMAKE_CMD+=$' -D INCLUDE_PLUGINS=OFF -D TEST_PLUGINS=OFF -DSUPPRESS_PY3EMBED=ON -DINCLUDE_PY3EMBED=OFF -DSUPPRESS_PY2EMBED=ON -DINCLUDE_PY2EMBED=OFF -D USE_PYTHON3=OFF -DINCLUDE_JAVAEMBED=ON'
-else
-      CMAKE_CMD+=$' -D INCLUDE_PLUGINS=ON -D TEST_PLUGINS=1 '${PYTHON_PLUGIN}
-fi
+CMAKE_CMD+=$' -D INCLUDE_PLUGINS=ON -D TEST_PLUGINS=1 '${PYTHON_PLUGIN}
 CMAKE_CMD+=$' -D MAKE_DOCS='$DOCS_BUILD
 CMAKE_CMD+=$' -D USE_CPPUNIT='$UNIT_TESTS
 CMAKE_CMD+=$' -D ECLWATCH_BUILD_STRATEGY='$ECLWATCH_BUILD_STRATEGY
@@ -676,14 +625,14 @@ fi
 # Build HPCC
 # 
 WriteMilestone "Build it" "$logFile"
-#WritePlainLog "Build it" "$logFile"
+
 
 BUILD_SUCCESS=true
-#make -j 16 -d package >> $logFile 2>&1
+
 CMD="make -j ${NUMBER_OF_BUILD_THREADS}"
 
 TIME_STAMP=$(date +%s)
-#${CMD} 2>&1 | tee -a $logFile
+
 if [[ ($HAVE_PKG -eq 0) || ($SKIP_BUILD = 0) ]]
 then
     WritePlainLog "cmd: ${CMD}  ($(date +%Y-%m-%d_%H-%M-%S))" "$logFile"
@@ -697,14 +646,10 @@ fi
 if [ $? -ne 0 ]
 then
     WritePlainLog "res: $res" "$logFile"
-    #cat $logFile
+
     WritePlainLog "Build failed" > ../build.summary
     BUILD_TIME=$(( $(date +%s) - $TIME_STAMP ))
-#    CheckResult "$logFile"
-#    
-#    WritePlainLog "ReportTimes." "$logFile"
-#    ReportTimes "$logFile"
-#    exit 1
+
     MyExit "-1"
 else
     WritePlainLog "Build: success" "$logFile"
@@ -778,7 +723,7 @@ TIME_STAMP=$(date +%s)
 
 WritePlainLog "packageExt: '$PKG_EXT', installCMD: '$PKG_INST_CMD'." "$logFile"
 
-#hpccpackage=$( grep 'Current release version' ${logFile} | cut -c 31- )".deb"
+
 hpccpackage=$( grep 'Current release version' ${logFile} | cut -c 31- )${PKG_EXT}
 if [[ ! -f $hpccpackage ]]
 then 
@@ -792,8 +737,6 @@ WritePlainLog "Check the build result" "$logFile"
 if [ -f "$hpccpackage" ]
 then
     
-    #echo "Build: success"
-    #echo "Build: success" >> $logFile 2>&1
     echo "Build: success" > ../build.summary
 
     if [[ "$ECLWATCH_BUILD_STRATEGY" != "SKIP" ]]
@@ -802,7 +745,7 @@ then
     fi
     
     WriteMilestone "Install $hpccpackage" "$logFile"
-    #sudo dpkg -i $hpccpackage >> $logFile 2>&1
+
     CMD="sudo ${PKG_INST_CMD} $hpccpackage"
     WritePlainLog "$CMD" "$logFile"
     TIME_STAMP=$(date +%s)
@@ -820,9 +763,7 @@ then
         if [ $res -ne 0 ]
         then
             WritePlainLog "Install failed: ${res}" > ../build.summary
-#            CheckResult "$logFile"
-#            CheckEclWatchBuildResult "$logFile"
-#            exit 1
+
             MyExit "-1"
         fi
     fi
@@ -833,8 +774,7 @@ then
     CheckCMakeResult "$logFile"
     
     cd ${PR_ROOT}
-    
-    
+        
     if [ ${CONTAINERIZED} -eq 0 ]
     then
         if [[ -f environment.xml ]]
@@ -874,7 +814,7 @@ then
 
         # Ensure no componenets are running
         sudo /etc/init.d/hpcc-init status >> $logFile 2>&1
-        IS_THOR_ON_DEMAND=$( sudo /etc/init.d/hpcc-init status | egrep -i -c 'mythor \[OD\]' )
+        IS_THOR_ON_DEMAND=$( sudo /etc/init.d/hpcc-init status | grep -E -i -c 'mythor \[OD\]' )
         WritePlainLog ""  "$logFile"
 
         hpccRunning=$( sudo /etc/init.d/hpcc-init status | grep -c "running")
@@ -884,7 +824,7 @@ then
             # If the result is "Service dafilesrv, mydafilesrv is still running."
             if [[ $res -ne 0 ]]
             then
-                #echo $res
+
                 WritePlainLog "res: $res" "$logFile"
                 sudo /etc/init.d/dafilesrv stop >> $logFile 2>&1
             fi
@@ -893,7 +833,7 @@ then
         # Let's start
         TIME_STAMP=$(date +%s)
         HPCC_STARTED=1
-        [ -z $NUMBER_OF_HPCC_COMPONENTS ] && NUMBER_OF_HPCC_COMPONENTS=$( sudo /opt/HPCCSystems/sbin/configgen -env /etc/HPCCSystems/environment.xml -list | egrep -i -v 'eclagent' | wc -l )
+        [ -z $NUMBER_OF_HPCC_COMPONENTS ] && NUMBER_OF_HPCC_COMPONENTS=$( sudo /opt/HPCCSystems/sbin/configgen -env /etc/HPCCSystems/environment.xml -list | grep -E -i -v 'eclagent' | wc -l )
         
         if [[ $IS_THOR_ON_DEMAND -ne 0 ]]
         then
@@ -904,7 +844,6 @@ then
         fi
 
         WriteMilestone "Start HPCC system with $NUMBER_OF_HPCC_COMPONENTS components" "$logFile"
-        #WritePlainLog "Let's start HPCC system" "$logFile"
 
         hpccStart=$( sudo /etc/init.d/hpcc-init start 2>&1 )
         hpccStatus=$( sudo /etc/init.d/hpcc-init status 2>&1 )
@@ -959,7 +898,7 @@ then
                 WritePlainLog "$(ls -ld /var/lib/HPCCSystems/hpcc-data/*)" "$logFile"
                 
                 WritePlainLog "cmd: ${cmd}" "$logFile"
-                #${cmd} 2>&1 | tee -a $logFile
+
                 ${cmd} >> $logFile 2>&1
                 
                 popd
@@ -975,17 +914,13 @@ then
                 WriteMilestone "WUTooltest" "$logFile"
                 WritePlainLog "$(ls -ld /var/lib/HPCCSystems/hpcc-data/*)" "$logFile"
                 WritePlainLog "cmd: ${cmd}" "$logFile"
-                #${cmd} 2>&1  | tee -a $logFile
                 ${cmd} >> $logFile 2>&1
                 
                 popd
             fi
             
             if [ -n "$REGRESSION_TEST" ]
-            then
-                #WritePlainLog "pushd ${TEST_DIR}" "$logFile"
-                #pushd ${TEST_DIR}
-                
+            then     
                 # Clean -up rte dir if exists
                 [[ -d $RTE_DIR ]] && rm -rf $RTE_DIR
                     
@@ -996,8 +931,7 @@ then
                     if [[ ! -d $RTE_DIR ]]
                     then 
                         WritePlainLog "Get the official version from GitHub" "$logFile"
-                        #mkdir -p $RTE_DIR
-                        #res=$( cp -rv $COMMON_RTE_DIR/* $RTE_DIR/ 2>&1)
+
                         res=$( git clone  https://github.com/AttilaVamos/RTE.git $RTE_DIR )
                         WritePlainLog "res: ${res}" "$logFile"
                         
@@ -1022,9 +956,6 @@ then
                 # We should update the config in RTE dir
                 WritePlainLog "pushd ${RTE_DIR}" "$logFile"
                 pushd ${RTE_DIR}
-                #pwd2=$(PR_ROOT )
-                #echo "pwd:${pwd2}"
-                #echo "pwd:${pwd2}" >> $logFile 2>&1
 
                 # Patch ecl-test.json to put log inside the smoketest-xxxx directory
                 mv ecl-test.json ecl-test_json.bak
@@ -1059,7 +990,7 @@ then
                         then
                             timeout=${TEST[1]}
                             # Check if test already has '//timeout' tag
-                            if [[ $( egrep -c '\/\/timeout' $file ) -eq 0 ]]
+                            if [[ $( grep -E -c '\/\/timeout' $file ) -eq 0 ]]
                             then
                                 # it has not, add one at the beginning of the file
                                 mv -fv $file $file-back
@@ -1077,12 +1008,9 @@ then
                         fi
                     done
                 fi
-                
-                #popd
-                #WritePlainLog "pushd ${RTE_DIR}" "$logFile"
-                #pushd ${RTE_DIR}
+
                 # Setup should run first
-                #cmd="./ecl-test setup -t all --suiteDir $TEST_DIR --config $TEST_DIR/ecl-test.json --loglevel ${LOGLEVEL} --timeout ${SETUP_TIMEOUT} --pq ${PARALLEL_QUERIES} ${ENABLE_STACK_TRACE}"
+
                 cmd="./ecl-test setup -t all --suiteDir $TEST_DIR --loglevel ${LOGLEVEL} --timeout ${SETUP_TIMEOUT} --pq ${PARALLEL_QUERIES} ${ENABLE_STACK_TRACE}"
                 WriteMilestone "Regression setup" "$logFile"
                 WritePlainLog "${cmd}" "$logFile"
@@ -1099,7 +1027,7 @@ then
                 # Check if there is no error in Setup phase
                 if [[ -f ${PR_ROOT}/setup.summary ]]
                 then
-                    numberOfNotFailedEngines=$( cat ${PR_ROOT}/setup.summary | egrep -o '\<failed:0\>' | wc -l )
+                    numberOfNotFailedEngines=$( cat ${PR_ROOT}/setup.summary | grep -E -o '\<failed:0\>' | wc -l )
                     if [[ $numberOfNotFailedEngines -ne 3 ]]
                     then
                         setupPassed=0
@@ -1117,16 +1045,16 @@ then
                             if [[ ${REGRESSION_TEST} == "*" ]]
                             then
                                 # Run whole Regression Suite
-                                #cmd="./ecl-test run -t ${TARGET} ${GLOBAL_EXCLUSION} --suiteDir $TEST_DIR --config $TEST_DIR/ecl-test.json --loglevel ${LOGLEVEL} --timeout ${REGRESSION_TIMEOUT} --pq ${PARALLEL_QUERIES} ${STORED_PARAMS} ${ENABLE_STACK_TRACE}"
+
                                 cmd="./ecl-test run -t ${TARGET} ${GLOBAL_EXCLUSION} --suiteDir $TEST_DIR --loglevel ${LOGLEVEL} --timeout ${REGRESSION_TIMEOUT} ${THOR_CONNECT_TIMEOUT} --pq ${PARALLEL_QUERIES} ${STORED_PARAMS} ${ENABLE_STACK_TRACE}"
                             else
                                 # Query the selected tests or whole suite if '*' in REGRESSION_TEST
-                                #cmd="./ecl-test query -t ${TARGET} ${GLOBAL_EXCLUSION} --suiteDir $TEST_DIR --config $TEST_DIR/ecl-test.json --loglevel ${LOGLEVEL} --timeout ${REGRESSION_TIMEOUT} --pq ${PARALLEL_QUERIES} ${STORED_PARAMS} ${ENABLE_STACK_TRACE} $REGRESSION_TEST"
+                               
                                 cmd="./ecl-test query -t ${TARGET} ${GLOBAL_EXCLUSION} --suiteDir $TEST_DIR --loglevel ${LOGLEVEL} --timeout ${REGRESSION_TIMEOUT} ${THOR_CONNECT_TIMEOUT} --pq ${PARALLEL_QUERIES} ${STORED_PARAMS} ${ENABLE_STACK_TRACE} $REGRESSION_TEST"
                             fi
                         
                             WritePlainLog "cmd: ${cmd}" "$logFile"
-                            #${cmd} 2>&1  | tee -a $logFile
+
                             ${cmd} >> $logFile 2>&1 
                             retVal=$?
                         else
@@ -1177,7 +1105,7 @@ then
                             ProcessLog "${PR_ROOT}/HPCCSystems-regression/log/" "roxie" "$logFile"
                         else
                             WritePlainLog "Command failed : ${retVal}" "$logFile"
-                            inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" | egrep -v 'HPCC-Platform/docs/|docbookx.dtd' )
+                            inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" | grep -E -v 'HPCC-Platform/docs/|docbookx.dtd' )
                             WritePlainLog "${inSuiteErrorLog}" "$logFile"
                         fi
                     fi
@@ -1197,8 +1125,8 @@ then
                     WritePlainLog "$OBT_DIR/QueryStat2.py not found. Skip perfromance result collection " "$logFile"
                 fi
                 
-                #setupPassed=0
-                #WritePlainLog "Setup failed." "$logFile"
+
+
                 inSuiteErrorLog=$( cat $logFile | sed -n "/\[Error\]/,/Suite destructor./p" )
                 if [ -n "${inSuiteErrorLog}" ]
                 then
@@ -1246,7 +1174,7 @@ then
                 sudo /etc/init.d/dafilesrv stop >> $logFile 2>&1
             fi
             hpccRunning=$( sudo /etc/init.d/hpcc-init status | grep -c "running")
-            #echo $hpccRunning" HPCC component running."
+
             WritePlainLog $hpccRunning" HPCC component running." "$logFile"
             if [[ $hpccRunning -ne 0 ]]
             then
@@ -1269,7 +1197,7 @@ then
 
     WritePlainLog "Check core files." "$logFile"
 
-    #cores=($(find /var/lib/HPCCSystems/ -name 'core*' -type f))
+
     cores=( $(find /var/lib/HPCCSystems/ -name 'core*' -type f -exec printf "%s\n" '{}' \; ) )
     
     if [ ${#cores[@]} -ne 0 ]
@@ -1294,9 +1222,7 @@ then
             WritePlainLog "Add $core (${coreSize} bytes) to archive" "$logFile"
 
             WritePlainLog "Generate backtrace for $core." "$logFile"
-            #base=$( dirname $core )
-            #lastSubdir=${base##*/}
-            #comp=${lastSubdir##my}
+
             corename=${core##*/}; 
             comp=$( echo $corename | tr '_.' ' ' | awk '{print $2 }' ); 
             compnamepart=$( find /opt/HPCCSystems/bin/ -iname "$comp*" -type f -print); 
@@ -1307,8 +1233,8 @@ then
             res=$( sudo gdb --batch --quiet -ex "set interactive-mode off" -ex "echo \nBacktrace for all threads\n==========================" -ex "thread apply all bt" -ex "echo \n Registers:\n==========================\n" -ex "info reg" -ex "echo \n Disas:\n==========================\n" -ex "disas" -ex "quit" "/opt/HPCCSystems/bin/${compname}" $core | sudo tee $core.trace 2>&1 )
             sudo chmod 0777 $core*
             WritePlainLog "Trace: $core.trace  generated" "$logFile"
-            #WritePlainLog "Files: $( sudo ls -l $core* ) " "$logFile"
-            #sudo zip ${HPCC_CORE_ARCHIVE} $c >> ${HPCC_CORE_ARCHIVE}.log
+
+
         done
 
         # Add core files to ZIP
@@ -1336,7 +1262,7 @@ then
         do 
             WritePlainLog "Core trace file: $trc" "$logFile"
 
-            wuid=$( cat $trc | egrep 'was generated' | sed -e 's/.*\(W2[0-9].*\)\s.*/\1/')
+            wuid=$( cat $trc | grep -E 'was generated' | sed -e 's/.*\(W2[0-9].*\)\s.*/\1/')
             WritePlainLog "wuid:$wuid" "$logFile"
 
             zap=$(find HPCCSystems-regression/zap/ -iname '*'"$wuid"'*' -type f -print)
@@ -1355,10 +1281,6 @@ then
 
     else
         WritePlainLog "There is no core file in /var/lib/HPCCSystems/" "$logFile"
-
-        #echo "There is no core file in /var/lib/HPCCSystems/" >> ${HPCC_CORE_ARCHIVE}.log
-        #echo "-----------------------------------------------------------" >> ${HPCC_CORE_ARCHIVE}.log
-        #echo " " >>${HPCC_CORE_ARCHIVE}.log
     fi
 
     # Only for debug purpose
@@ -1380,12 +1302,6 @@ else
     WritePlainLog "Build: failed!" "$logFile"
     echo "Build: failed" > ../build.summary
     
-#    CheckResult "$logFile"
-#    CheckEclWatchBuildResult "$logFile"
-#    WritePlainLog "ReportTimes." "$logFile"
-#    ReportTimes "$logFile"
-#
-#    exit 1
     MyExit "-1"
 fi
 

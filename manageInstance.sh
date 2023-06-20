@@ -3,7 +3,6 @@
 PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 #set -x
 
-
 LOG_FILE="/dev/null"
 
 #
@@ -135,7 +134,6 @@ do
     
         instance*)  INSTANCE_NAME=${param//instanceName=/}
                 INSTANCE_NAME=${INSTANCE_NAME//\"/}
-                #INSTANCE_NAME=${INSTANCE_NAME//PR/PR-}
                 WriteLog "Instancename: '${INSTANCE_NAME}'" "$LOG_FILE"
                 ;;
                 
@@ -167,9 +165,6 @@ do
                 
         baseTest*) BASE_TEST=${param}
                 WriteLog "Base test: ${BASE_TEST}" "$LOG_FILE"
-
-
-
                 ;;
                 
         base*) BASE=${param//base=/}
@@ -237,18 +232,11 @@ WriteLog "Param: region= ${REGION}" "$LOG_FILE"
 SSH_KEYFILE="~/HPCC-Platform-Smoketest.pem"
 SSH_OPTIONS="-oConnectionAttempts=3 -oConnectTimeout=20 -oStrictHostKeyChecking=no"
 
-
-# Better approach
 # CentOS 7
 NEW_AMI=0
 AMI_ID=$( aws ec2 describe-images --owners 446598291512 --filters "Name=name,Values=*dev-el7-x86_64" --query Images[].ImageId --output text )
 [ -z "${AMI_ID}" ] && AMI_ID=$( aws ec2 describe-images --owners 446598291512 --filters "Name=name,Values=*dev-el7-x86_64-2021" --query Images[].ImageId --output text ) || NEW_AMI=1
 [ -z "${AMI_ID}" ] && AMI_ID="ami-0f6f902a9aff6d384"
-
-#Intern TODO: See why CentOS8 is not preferred
-# CentOS 8
-#AMI_ID=$( aws ec2 describe-images --owners 446598291512 --filters "Name=name,Values=*-el8-x86_64" --query Images[].ImageId --output text )
-#[ -z ${AMI_ID} ] && AMI_ID="ami-0c464387e25013b1f"
 WriteLog "AMI_ID: ${AMI_ID}, new AMI: ${NEW_AMI}" "$LOG_FILE"
 
 if [[ $REGION =~ 'us-east-1' ]]
@@ -262,8 +250,6 @@ else
 fi
 
 WriteLog "Create instance for ${INSTANCE_NAME}, type: $INSTANCE_TYPE, disk: $instanceDiskVolumeSize, build ${DOCS_BUILD}" "$LOG_FILE"
-
-
 
 instance=$( aws ec2 run-instances --image-id ${AMI_ID} --count 1 --instance-type $INSTANCE_TYPE --key-name HPCC-Platform-Smoketest --security-group-ids ${SECURITY_GROUP_ID} --subnet-id ${SUBNET_ID} --instance-initiated-shutdown-behavior terminate --block-device-mappings "[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":$instanceDiskVolumeSize,\"DeleteOnTermination\":true,\"Encrypted\":true}}]" 2>&1 )
 
@@ -450,7 +436,7 @@ then
     REQUIRED_FOR_VCPKG_BUILD=candidate-8.8.x
     WriteLog "Required for VCPKG build: $REQUIRED_FOR_VCPKG_BUILD" "$LOG_FILE"
     [ $(printf "%s\n" "$REQUIRED_FOR_VCPKG_BUILD" "$BASE" | sort -V | head -n1) = $REQUIRED_FOR_VCPKG_BUILD ] && VCPKG_INSTALLS_NEWER_VERSION=1 || VCPKG_INSTALLS_NEWER_VERSION=0
-
+    #[[  "candidate-8.6.x candidate-8.4.x candidate-8.2.x" =~ "$BASE" ]] && VCPKG_INSTALLS_NEWER_VERSION=0 || VCPKG_INSTALLS_NEWER_VERSION=1
     WriteLog "VCPKG_INSTALLS_NEWER_VERSION: $VCPKG_INSTALLS_NEWER_VERSION" "$LOG_FILE"
     
     BOOST_PKG=$( find ~/ -iname 'boost_1_71*' -type f -size +100M -print | head -n 1 )
@@ -509,12 +495,7 @@ then
     WriteLog "Upload init.sh" "$LOG_FILE"
     # CentOS 7
     res=$( rsync -vapE --timeout=60 -e "ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS}" ${SMOKETEST_HOME}/init.sh ${SMOKETEST_HOME}/timestampLogger.sh centos@${instancePublicIp}:/home/centos/ 2>&1 )
-    # CentOS 8
-    #res=$( rsync -vapE --timeout=60 -e "ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS}" ${SMOKETEST_HOME}/init-cos8.sh centos@${instancePublicIp}:/home/centos/init.sh 2>&1 )
     WriteLog "Res: $res" "$LOG_FILE"
-
-
-
 
     WriteLog "Check user directory" "$LOG_FILE"
     res=$( ssh -i ${SSH_KEYFILE} ${SSH_OPTIONS} centos@${instancePublicIp} "ls -l" 2>&1 )

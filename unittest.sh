@@ -5,7 +5,7 @@ PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 UNITTEST_LIST_PARAMS="-l"
 UNITTEST_EXEC_PARAMS="-e"
 TIMEOUT=180 #90
-#echo "param:'"$1"'
+
 if [ "$1." != "." ]
 then
     param=$1
@@ -43,7 +43,7 @@ UNITTEST_SUMMARY_FILE=${OBT_LOG_DIR}/unittests.summary
 UNITTEST_BIN_PATH=/opt/HPCCSystems/bin
 UNITTEST_LIB_PATH=/opt/HPCCSystems/lib
 UNITTEST_BIN=unittests
-#UNITTEST_EXCLUSION='CcdFileTest'
+
 UNITTEST_EXCLUSION=" InplaceIndexTest "
 
 HPCC_DATA_DIR=/var/lib/HPCCSystems/hpcc-data
@@ -174,7 +174,7 @@ WriteLog "WatchDog pid: $( cat ./WatchDog.pid )." "$UNITTEST_LOG_FILE"
 #
 WriteLog "Excluded testcase(s): ${UNITTEST_EXCLUSION}" "$UNITTEST_LOG_FILE"
 
-#pushd ${UNITTEST_BIN_PATH}
+
 
 TIME_STAMP=$(date +%s)
 
@@ -190,7 +190,7 @@ do
         continue
     fi
     
-    #result=$( sudo unbuffer ${UNITTEST_BIN} ${UNITTEST_EXEC_PARAMS} $unittest 2>&1 )
+
     result=$( ${UNITTEST_BIN_PATH}/${UNITTEST_BIN} ${UNITTEST_EXEC_PARAMS} $unittest 2>&1 )
     retCode=$( echo $?)
     signal=0
@@ -206,7 +206,7 @@ do
     echo "retcode:$retCode" >> $UNITTEST_RESULT_FILE
     echo "retcode:$retCode" >> $UNITTEST_LOG_FILE
 
-    IS_NOT_TIMEOUT=$( echo $result | egrep -ic "ok|run")
+    IS_NOT_TIMEOUT=$( echo $result | grep -E -ic "ok|run")
     if [[ $IS_NOT_TIMEOUT -eq 1 ]]
     then
         echo "${result}" >> $UNITTEST_RESULT_FILE
@@ -233,7 +233,7 @@ done
 
 WriteLog "Unittests finished." "$UNITTEST_LOG_FILE"
 
-#popd
+
 
 WriteLog "End." "$UNITTEST_LOG_FILE"
 
@@ -245,7 +245,7 @@ cp $UNITTEST_RESULT_FILE $UNITTEST_LAST_RESULT_FILE
 #
 
 #For test the result processing
-#UNITTEST_RESULT_FILE=${OBT_LOG_DIR}/unittest-result-2016-04-15_12-52-58.log
+
 
 #set -x
 TOTAL=0
@@ -255,25 +255,25 @@ ERRORS=0
 TIMEOUT=0
 summary_log=''
 IFS=$'\n'
-#results=($( cat ${UNITTEST_RESULT_FILE} | egrep -i '\<ok|run:|excep|[[:digit:]]+\)\stest|\-\s'  | egrep -v 'Digisign IException thrown' ))
-results=("$( cat ${UNITTEST_RESULT_FILE} | egrep -i '\<ok|run:|excep|[[:digit:]]+\)\stest|\-\s|timeout'  | egrep -v 'Digisign IException thrown|iorate|RSA|ConfigMgr' ) ")
+
+results=("$( cat ${UNITTEST_RESULT_FILE} | grep -E -i '\<ok|run:|excep|[[:digit:]]+\)\stest|\-\s|timeout'  | grep -E -v 'Digisign IException thrown|iorate|RSA|ConfigMgr' ) ")
 
 for res in ${results[@]}
-#cat ${UNITTEST_RESULT_FILE} | egrep -i '^ok|Run:' | while read res
+
 do
     echo "Res: '${res}'"
     IS_PASS=$( echo $res | grep -i -c 'ok (' )
     if [[ $IS_PASS -eq 1 ]]
     then
         RESULT=$(echo $res | grep -i 'ok (' )
-        #WriteLog "Result: ${RESULT}" "$UNITTEST_LOG_FILE"
+
         UNIT_TOTAL=$(echo "${RESULT}" | sed -n "s/^[[:space:]]*OK[[:space:]]*(\([0-9]*\)\(.*\)$/\1/p" )
         UNIT_PASSED=$UNIT_TOTAL
         UNIT_FAILED=0
         UNIT_ERRORS=0
         TOTAL=$(( $TOTAL + $UNIT_TOTAL))
         PASSED=$(( $PASSED + $UNIT_PASSED))
-        #FAILED=$(( $FAILED + $UNIT_FAILED))   
+
     else
         RESULT=$( echo $res | grep -i 'Run:' )
         if [[ "$RESULT" != "" ]]
@@ -292,7 +292,7 @@ do
                 summary_log=${summary_log}"$res\n"
             fi
             UNIT_PASSED="$(( $UNIT_TOTAL - $UNIT_FAILED - $UNIT_ERRORS - $UNIT_TIMEOUT))"
-            #WriteLog "TestResult:unit:total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:${UNIT_ERRORS} timeout:${UNIT_TIMEOUT}"  "$UNITTEST_LOG_FILE"
+
             echo "TestResult:unittest:total:${UNIT_TOTAL} passed:${UNIT_PASSED} failed:${UNIT_FAILED} errors:${UNIT_ERRORS} timeout:${UNIT_TIMEOUT}" > $UNITTEST_SUMMARY_FILE
             TOTAL=$(( $TOTAL + $UNIT_TOTAL))
             PASSED=$(( $PASSED + $UNIT_PASSED))

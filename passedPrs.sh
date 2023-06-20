@@ -24,7 +24,6 @@ then
 else
     param=$1
     upperParam=${param^^}
-
     case $upperParam in
 
 	YEST*) day=$( date -I -d "$today - 1 day" )
@@ -52,7 +51,7 @@ then
     echo "Passed PRs on ${day}:"
     cat prp-${day}.log | grep -E '^([0-9]*)/([0-9]*)\. Process|wait|^(\s*)sha|^(\s*)base|^(\s*)user|HPCC Star|^(\s*)start|^(\s*)end|^(\s*)pass|scheduled|done, exit' | grep -E -i -B7 'pass : True' | grep -E 'PR-' | sed -n 's/^\(.*\)\s\(PR-[0-9].*\),\(.*\)$/    \2/p' | sort -u
 else
-    echo "We have no log file for ${day}. Try it in the log achive."
+    echo "We have not log file for ${day}. Try it in the log achive."
 fi
 
 echo "End."

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Run in a console: 
 #  while true; do clear; date "+%Y-%m-%d %H:%M:%S" ; ./showSchedulerStatus.sh ; sleep 15; done
 
@@ -30,9 +29,9 @@ then
     done;  
     if [[ $checkCount -ne 0 ]]
     then
-        cat $logFile | sed -n "${last_entry_line},/*/p" | egrep -v 'Build|Number|No |Add|^\n*$'
+        cat $logFile | sed -n "${last_entry_line},/*/p" | grep -E -v 'Build|Number|No |Add|^\n*$'
     fi
-    #echo "${PIPESTATUS[*]}" 
+
 else
     echo "No file"; 
 fi

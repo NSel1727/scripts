@@ -134,7 +134,6 @@ do
     
         instance*)  INSTANCE_NAME=${param//instanceName=/}
                 INSTANCE_NAME=${INSTANCE_NAME//\"/}
-                #INSTANCE_NAME=${INSTANCE_NAME//PR/PR-}
                 WriteLog "Instancename: '${INSTANCE_NAME}'" "$LOG_FILE"
                 ;;
                 
