@@ -129,6 +129,14 @@ trap SignalHandler SIGINT
 trap SignalHandler SIGTERM
 trap SignalHandler SIGKILL
 
+#export addGitComment=0
+#export runOnce=0
+#export keepFiles=0
+#export enableShallowClone=0
+#export removeMasterAtExit=0
+#export testOnlyOnePR=0
+#export AVERAGE_SESSION_TIME=0.5 # hours
+
 echo "At $(date "+%Y-%m-%d %H:%M:%S") " >> ${logfile} 2>&1
 
 # To avoid overlapping if a session is stil running 

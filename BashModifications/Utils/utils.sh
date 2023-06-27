@@ -138,7 +138,7 @@ WriteEnvInfo()
     echo "CPU speed: $SPEED_OF_CPUS $SPEED_OF_CPUS_UNIT" >> $logFile
 
     echo "CPU Bogo Mips: $BOGO_MIPS_OF_CPUS"
-    echo "CPU Bogo Mips: $BOGO_MIPS_OF_CPUFS" >> $logFile
+    echo "CPU Bogo Mips: $BOGO_MIPS_OF_CPUS" >> $logFile
 
     if [[ $NUMBER_OF_CPUS -ge 20 ]]
     then

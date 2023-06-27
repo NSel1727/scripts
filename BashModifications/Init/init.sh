@@ -202,26 +202,6 @@ then
 else
     myEcho "CMake install not found. Current version: $(cmake --version)"
 fi
-myEcho "-------------------------------------"
-
-myEcho "Check and install curl 7.67.0"
-CURL_7_67=$( find ~/ -iname 'curl-7.67.0.tar.gz' -type f -size +1M -print | head -n 1 )
-if [[ -n "$CURL_7_67" ]]
-then
-    wget --no-check-certificate https://curl.se/download/curl-7.81.0.tar.gz
-    myEcho "$CURL_7_81 found, unzip and install it"
-    gunzip -c curl-7.81.0.tar.gz | tar xvf -
-    pushd curl-7.81.0
-
-    ./configure --with-gnutls --with-ssl
-    make -j && \
-    sudo make install
-    popd
-    type "curl"
-    curl --version;
-else
-    myEcho "curl 7.67.0 not found. Current version: $(curl --version)"
-fi
 
 myEcho "................................................"
 myEcho "Install VCPKG stuff"

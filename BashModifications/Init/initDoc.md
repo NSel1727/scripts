@@ -58,3 +58,26 @@ Line 35 Removed:
 AVERAGE_SESSION_TIME=0.75 # Hours for m4.4xlarge instance
 ```
 
+Curl Check and Installation Removed:
+```
+myEcho "-------------------------------------"
+
+myEcho "Check and install curl 7.67.0"
+CURL_7_67=$( find ~/ -iname 'curl-7.67.0.tar.gz' -type f -size +1M -print | head -n 1 )
+if [[ -n "$CURL_7_67" ]]
+then
+    wget --no-check-certificate https://curl.se/download/curl-7.81.0.tar.gz
+    myEcho "$CURL_7_81 found, unzip and install it"
+    gunzip -c curl-7.81.0.tar.gz | tar xvf -
+    pushd curl-7.81.0
+
+    ./configure --with-gnutls --with-ssl
+    make -j && \
+    sudo make install
+    popd
+    type "curl"
+    curl --version;
+else
+    myEcho "curl 7.67.0 not found. Current version: $(curl --version)"
+fi
+```

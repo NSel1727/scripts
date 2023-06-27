@@ -2,16 +2,7 @@
 
 Line 16: "#INSTANCE_ID=$( sudo ls -l /var/lib/cloud/instance | cut -d' '  -f12 | cut -d '/' -f6 )"
 
-Lines 134-143: "#export addGitComment=0
-                #export runOnce=0
-                #export keepFiles=0
-                #export enableShallowClone=0
-                #export removeMasterAtExit=0
-                #export testOnlyOnePR=0
-                #export AVERAGE_SESSION_TIME=0.5 # hours
-
-
-                #echo "pwd:$( pwd )""
+Line 143: "#echo "pwd:$( pwd )""
                 
 Lines 162-173: "# Using GitHub token the agent magic doesn't necessary 
                 # Update agent pid
