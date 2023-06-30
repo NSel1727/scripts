@@ -434,71 +434,15 @@ cd $PR_ROOT
 
 cd ${BUILD_ROOT}
 
-MAKE_FILE="$SOURCE_ROOT/cmake_modules/buildBOOST_REGEX.cmake"
-BOOST_URL=$( grep -E 'URL ' $MAKE_FILE | awk '{print $2}')
-BOOST_PKG=${BOOST_URL##*/}; 
-res=$( wget -v --spider  $BOOST_URL )
-isDownloadable=$?
+res=$( git status )
+ret=$?
+WritePlainLog "ret: ${ret}\nres:\n$res" "$logFile"
 
-if [[ "${isDownloadable}" -ne 0 ]]
-then
-    WritePlainLog "* * * * Can't download file from $BOOST_URL, use local copy." "$logFile"
+removeLog4j=$( find . -iname '*log4j*' -type f -exec rm -fv {} \; )
+WritePlainLog "Remove LOG4J items result:\n${removeLog4j}" "$logFile"
 
-    if [[ -f $HOME/$BOOST_PKG ]]
-    then
-        if [[ ! -f ${BUILD_ROOT}/downloads/$BOOST_PKG ]]
-        then
-            WritePlainLog "There is not '${BUILD_ROOT}/downloads/$BOOST_PKG' file." "$logFile"
-
-            WritePlainLog "Hack 'HPCC-Platform/cmake_modules/buildBOOST_REGEX.cmake' to use local copy" "$logFile"
-            sed -i -e 's/URL \(.*\)$/URL '"${HOME//\//\\/}\/$BOOST_PKG"'/g' -e 's/URL_HASH/# URL_HASH/g' -e 's/TIMEOUT \(.*\)/TIMEOUT 90/g'  $MAKE_FILE
-            res=$( grep -E 'URL |URL_HASH|TIMEOUT' $MAKE_FILE )
-            WritePlainLog "res:\n$res" "$logFile"
-
-            WritePlainLog "$( ls -l ${BUILD_ROOT}/downloads/*.gz )" "$logFile"
-     
-        fi
-    else
-        WritePlainLog "The $BOOST_PKG not found." "$logFile"
-    fi    
-else
-    WritePlainLog "The $BOOST_PKG is downloadable." "$logFile"
-    sed -e 's/TIMEOUT \(.*\)/TIMEOUT 180/g' ${MAKE_FILE} >temp.cmake && sudo mv -f temp.cmake ${MAKE_FILE}
-    res=$( grep -E 'URL |TIMEOUT' $MAKE_FILE )
-    WritePlainLog "res:\n$res" "$logFile"
-fi
-
-pushd ${PR_ROOT}
-if [[ ${ENABLE_CMakeLists_HACK} -eq 1 ]]
-then
-    WritePlainLog "Patch/hack some CMakeLists.txt" "$logFile"
-    pushd HPCC-Platform
-    sed -i -e 's/COMMAND make/COMMAND make -j '"${NUMBER_OF_BUILD_THREADS}"'/g' plugins/cassandra/CMakeLists.txt
-    sed -i -e 's/\${CMAKE_MAKE_PROGRAM}/\${CMAKE_MAKE_PROGRAM} -j '"${NUMBER_OF_BUILD_THREADS}"'/g' plugins/couchbase/CMakeLists.txt
-    sed -i -e 's/COMMAND make/COMMAND \${CMAKE_MAKE_PROGRAM} -j '"${NUMBER_OF_BUILD_THREADS}"'/g' plugins/redis/CMakeLists.txt
-    sed -i -e 's/\${CMAKE_MAKE_PROGRAM}/\${CMAKE_MAKE_PROGRAM} -j '"${NUMBER_OF_BUILD_THREADS}"'/g' system/aws/CMakeLists.txt
-    sed -i -e 's/\${CMAKE_MAKE_PROGRAM}/\${CMAKE_MAKE_PROGRAM} -j '"${NUMBER_OF_BUILD_THREADS}"'/g' system/azure/CMakeLists.txt
-    
-    res=$( git status )
-    ret=$?
-    WritePlainLog "ret: ${ret}\nres:\n$res" "$logFile"
-    
-    removeLog4j=$( find . -iname '*log4j*' -type f -exec rm -fv {} \; )
-    WritePlainLog "Remove LOG4J items result:\n${removeLog4j}" "$logFile"
-    
-    removeCommonsText=$( find . -iname 'commons-text-*.jar' -type f -exec rm -fv {} \; )
-    WritePlainLog "Remove 'commons-text-*.jar' items result:\n${removeCommonsText}" "$logFile"
-    
-    if [[ ${VCPKG_BUILD} -eq 1 ]]
-    then
-        [ ! -d vcpkg-overlays ] && mkdir vcpkg-overlays
-    fi
-    popd
-    WritePlainLog "Done" "$logFile"
-else
-    WritePlainLog "CMakeFile patch hack disabled." "$logFile"
-fi
-popd
+removeCommonsText=$( find . -iname 'commons-text-*.jar' -type f -exec rm -fv {} \; )
+WritePlainLog "Remove 'commons-text-*.jar' items result:\n${removeCommonsText}" "$logFile"
 
 WritePlainLog "Create makefiles $(date +%Y-%m-%d_%H-%M-%S)" "$logFile"
 
