@@ -1,3 +1,6 @@
 ##Comment Removals
 
-Line 28: "# echo "Param: ${upperParam}""
+Line 28:
+```
+# echo "Param: ${upperParam}"
+```

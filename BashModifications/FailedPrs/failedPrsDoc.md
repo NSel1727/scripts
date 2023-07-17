@@ -1,6 +1,9 @@
 ##Removed Comments
 
-Line 27: # echo "Param: ${upperParam}""
+Line 27: 
+```
+# echo "Param: ${upperParam}"
+```
 
 ##Other Changes
 

@@ -1,5 +1,8 @@
 ##Comment Removals
 
-Line 35: "#echo "${PIPESTATUS[*]}" 
+Line 35:
+```
+#echo "${PIPESTATUS[*]}" 
+```
 
 

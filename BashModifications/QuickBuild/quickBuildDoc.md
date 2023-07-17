@@ -1,14 +1,22 @@
 ##Comment Removals
 
-Lines 54-58: "#res=$(  exec >> ${logFile} 2>&1 )
+Lines 54-58:
+```
+#res=$(  exec >> ${logFile} 2>&1 )
               #exec > ${logFile} 2>&1
               #echo "Res:${res}"
               #echo "Res:${res}" >> $logFile 2>&1
-              #echo "logFile:$logFile""
+              #echo "logFile:$logFile"
+```
               
-Line 178: "#echo $upperPlugin"
+Line 178:
+```
+#echo $upperPlugin
+```
 
-Lines 225-233: "#-------------------------------------------------
+Lines 225-233:
+```
+#-------------------------------------------------
                 #
                 # Update submodule
                 #cd $SOURCE_ROOT
@@ -16,13 +24,19 @@ Lines 225-233: "#-------------------------------------------------
                 #echo "Update Git submodules"
                 #echo "Update Git submodules" >> $logFile 2>&1
 
-                #git submodule update --init --recursive"
+                #git submodule update --init --recursive
+```
                 
-Lines 256-258: "#cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
+Lines 256-258:
+```
+#cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
 #cmake  -G"Eclipse CDT4 - Unix Makefiles" -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 -DSUPPRESS_PY3EMBED=ON -DINCLUDE_PY3EMBED=OFF -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform >> $logFile 2>&1
-#CM_CMD="cmake -DRUNTIME_USER=$RUNTIME_USER -DDESTDIR=${PR_ROOT}/$TARGET_DIR -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 ${PYTHON_PLUGIN} -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -DECLWATCH_BUILD_STRATEGY=$ECLWATCH_BUILD_STRATEGY -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform""
+#CM_CMD="cmake -DRUNTIME_USER=$RUNTIME_USER -DDESTDIR=${PR_ROOT}/$TARGET_DIR -DINCLUDE_PLUGINS=ON -DTEST_PLUGINS=1 ${PYTHON_PLUGIN} -DMAKE_DOCS=$DOCS_BUILD -DUSE_CPPUNIT=$UNIT_TESTS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DUSE_LIBXSLT=ON -DXALAN_LIBRARIES= -D MAKE_CASSANDRAEMBED=1 -D CMAKE_BUILD_TYPE=$BUILD_TYPE -DECLWATCH_BUILD_STRATEGY=$ECLWATCH_BUILD_STRATEGY -D CMAKE_ECLIPSE_MAKE_ARGUMENTS=-30 ../HPCC-Platform ln -s ../HPCC-Platform"
+```
 
-Lines 281-294: "# -- Current release version is hpccsystems-platform_community-5.1.0-trunk0Debugquantal_amd64
+Lines 281-294:
+```
+# -- Current release version is hpccsystems-platform_community-5.1.0-trunk0Debugquantal_amd64
                 # In quick build method we have not package
 
                 #hpccpackage="hpccsystems-platform_community-4.1.0-trunk1Debugquantal_amd64.deb"
@@ -35,17 +49,32 @@ Lines 281-294: "# -- Current release version is hpccsystems-platform_community-5
                 #else
                 #    echo "To remove ${hpccpackage} success"
                 #    echo "To remove ${hpccpackage} success" >> $logFile 2>&1
-                #fi"
+                #fi
+```
                 
-Line 334: "#WritePlainLog "Build it" "$logFile""
+Line 334:
+```
+#WritePlainLog "Build it" "$logFile"
+```
 
-Line 337: "#make -j 16 -d package >> $logFile 2>&1"
+Line 337:
+```
+#make -j 16 -d package >> $logFile 2>&1
+```
 
-Line 343: "#${CMD} 2>&1 | tee -a $logFile"
+Line 343:
+```
+#${CMD} 2>&1 | tee -a $logFile
+```
 
-Line 350: "#cat $logFile"
+Line 350:
+```
+#cat $logFile
+```
 
-Lines 363-394: "# # In quick build method we do not make package
+Lines 363-394:
+```
+# # In quick build method we do not make package
 #CMD="make -j ${NUMBER_OF_BUILD_THREADS} package"
 #
 #echo "cmd: ${CMD} $(date +%Y-%m-%d_%H-%M-%S)"
@@ -76,38 +105,74 @@ Lines 363-394: "# # In quick build method we do not make package
 #hpccpackage=$( grep 'Current release version' ${logFile} | cut -c 31- )${PKG_EXT}
 #
 #echo "HPCC package: ${hpccpackage}"
-#echo "HPCC package: ${hpccpackage}" >> $logFile 2>&1"
+#echo "HPCC package: ${hpccpackage}" >> $logFile 2>&1
+```
 
-Line 400: "#echo "Build: success" >> $logFile 2>&1"
+Line 400:
+```
+#echo "Build: success" >> $logFile 2>&1
+```
 
-Line 476: "#WritePlainLog "Let's start HPCC system" "$logFile""
+Line 476:
+```
+#WritePlainLog "Let's start HPCC system" "$logFile"
+```
 
-Lines 556-558: "#pwd2=$(PR_ROOT )
+Lines 556-558:
+```
+#pwd2=$(PR_ROOT )
                 #echo "pwd:${pwd2}"
-                #echo "pwd:${pwd2}" >> $logFile 2>&1"
+                #echo "pwd:${pwd2}" >> $logFile 2>&1
+```
                 
-Line 578: "#${cmd} 2>&1  | tee -a $logFile"
+Line 578:
+```
+#${cmd} 2>&1  | tee -a $logFile
+```
 
-Line 612: "#${cmd} 2>&1  | tee -a $logFile"
+Line 612:
+```
+#${cmd} 2>&1  | tee -a $logFile
+```
 
-Lines 630-631: "#setupPassed=0
-                #WritePlainLog "Setup failed." "$logFile"
+Lines 630-631:
+```
+#setupPassed=0
+#WritePlainLog "Setup failed." "$logFile
+```
                 
-Line 700: "#cores=($(find $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/ -name 'core*' -type f))"
+Line 700:
+```
+#cores=($(find $PR_ROOT/$TARGET_DIR/var/lib/HPCCSystems/ -name 'core*' -type f))
+```
 
-Lines 725-727: "#base=$( dirname $core )
-                #lastSubdir=${base##*/}
-                #comp=${lastSubdir##my}"
+Lines 725-727:
+```
+#base=$( dirname $core )
+#lastSubdir=${base##*/}
+#comp=${lastSubdir##my}
+```
                 
-Line 736: "#sudo zip ${HPCC_CORE_ARCHIVE} $c >> ${HPCC_CORE_ARCHIVE}.log"
+Line 736:
+```
+#sudo zip ${HPCC_CORE_ARCHIVE} $c >> ${HPCC_CORE_ARCHIVE}.log
+```
 
-Lines 756-758: "#echo "There is no core file in /var/lib/HPCCSystems/" >> ${HPCC_CORE_ARCHIVE}.log
-                #echo "-----------------------------------------------------------" >> ${HPCC_CORE_ARCHIVE}.log
-                #echo " " >>${HPCC_CORE_ARCHIVE}.log"
+Lines 756-758:
+```
+#echo "There is no core file in /var/lib/HPCCSystems/" >> ${HPCC_CORE_ARCHIVE}.log
+#echo "-----------------------------------------------------------" >> ${HPCC_CORE_ARCHIVE}.log
+#echo " " >>${HPCC_CORE_ARCHIVE}.log
+```
                 
-Line 774: "#zip ${HPCC_LOG_ARCHIVE} -r ${PR_ROOT}/${TARGET_DIR}/var/lib/HPCCSystems/myeclagent/temp/* >> $logFile 2>&1"
+Line 774:
+```
+#zip ${HPCC_LOG_ARCHIVE} -r ${PR_ROOT}/${TARGET_DIR}/var/lib/HPCCSystems/myeclagent/temp/* >> $logFile 2>&1
+```
 
-Lines 780-803: "#if [ -f $TARGET_DIR/opt/HPCCSystems/sbin/complete-uninstall.sh ]
+Lines 780-803:
+```
+#if [ -f $TARGET_DIR/opt/HPCCSystems/sbin/complete-uninstall.sh ]
                 #    then
                 #        sudo /opt/HPCCSystems/sbin/complete-uninstall.sh 
                 #        echo "HPCC Uninstall: OK"
@@ -130,10 +195,14 @@ Lines 780-803: "#if [ -f $TARGET_DIR/opt/HPCCSystems/sbin/complete-uninstall.sh 
                 #    else
                 #        echo "HPCC Uninstall: failed"
                 #        echo "HPCC Uninstall: failed" >> $logFile 2>&1
-                #    fi"
+                #    fi
+```
                 
-Lines 819-820: "# give it some time
-                #sleep 5"
+Lines 819-820:
+```
+# give it some time
+                #sleep 5
+```
                 
 ##Other Changes
 

@@ -1,10 +1,18 @@
 ##Comment Removals
 
-Line 16: "#INSTANCE_ID=$( sudo ls -l /var/lib/cloud/instance | cut -d' '  -f12 | cut -d '/' -f6 )"
+Line 16:
+```
+#INSTANCE_ID=$( sudo ls -l /var/lib/cloud/instance | cut -d' '  -f12 | cut -d '/' -f6 )
+```
 
-Line 143: "#echo "pwd:$( pwd )""
+Line 143:
+```
+#echo "pwd:$( pwd )"
+```
                 
-Lines 162-173: "# Using GitHub token the agent magic doesn't necessary 
+Lines 162-173:
+```
+# Using GitHub token the agent magic doesn't necessary 
                 # Update agent pid
                 # get the latest ssh-* directory name
                 #agentdir=$( sudo ls -td1 /tmp/ssh-* | head -n 1 );
@@ -15,9 +23,12 @@ Lines 162-173: "# Using GitHub token the agent magic doesn't necessary
                 #printf "export SSH_AUTH_SOCK=%s/%s\n" ${agentdir} $agentPid > .ssh_auth_sock.var
                 #cat .ssh_auth_sock.var
                 #. ./.ssh_auth_sock.var
-                #env | grep SSH_AUTH_SOCK"
+                #env | grep SSH_AUTH_SOCK
+```
                 
-Lines 179-190: "# Using GitHub token the agent magic doesn't necessary
+Lines 179-190:
+```
+# Using GitHub token the agent magic doesn't necessary
                 # Remove old agent(s)
                 #echo "Remove old security agents"
                 #sudo find /tmp/ -iname 'ssh-*' -type d | egrep -v "$agentdir" | while read oldAgentDir
@@ -28,6 +39,6 @@ Lines 179-190: "# Using GitHub token the agent magic doesn't necessary
                 #    sudo kill -9 $oldAgentPid
                 #    sudo rm -rf $oldAgentDir
                 #done
-                #echo "Done.""
+                #echo "Done."
+```
                 
-

@@ -9,6 +9,6 @@ fi
 ```
 Updated:
 ```
-PYTHON_APPS="listTests3.py showStatus.py showSchedulerStatus.py"
+PYTHON_APPS="listTests3.py showStatus.py showSchedulerStatus.py
 ```
 This is because all Smoketest Python files will be ran in Python 3.
